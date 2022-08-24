@@ -1,2 +1,2 @@
-# Projeto-Programa-o-utilizando-sockets.
+# Projeto: Programação utilizando sockets.
 Este projeto é o quarto componente da avaliação da disciplina.
