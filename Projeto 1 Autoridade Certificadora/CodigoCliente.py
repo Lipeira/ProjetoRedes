@@ -3,10 +3,11 @@
 #Código TCP
 import random
 from socket import socket, AF_INET, SOCK_STREAM
-#Passo 1: Criando o socket.
+
+# Criando o socket
 mClientSocket = socket(AF_INET, SOCK_STREAM)
-#Passo 2: Transformando o socket criado num socket de um cliente,
-#ou seja, colacando para realizar solicitações.
+
+# Colocando o socket para realizar solicitações
 mClientSocket.connect(('localhost', 1235))
 
 data = mClientSocket.recv(2048)
@@ -22,6 +23,4 @@ while True:
     data = mClientSocket.recv(2048)
     reply = data.decode()
     print(f'Resposta recebida:{reply}')
-
-# teste
 

@@ -10,11 +10,11 @@ def diffie_hellman():
     X = random.randint(1,999999)
     Y = random.randint(1,999999)
 
-    Ra = (A*X) % B
-    Rb = (A*Y) % B
+    Ra = (Y**A) % X
+    Rb = (Y**B) % X
 
-    PrivateKeyB = (Rb*X) % B
-    PrivateKeyA = (Ra*Y) % B
+    PrivateKeyA = (Rb**A) % X
+    PrivateKeyB = (Ra**B) % X
 
     if PrivateKeyA == PrivateKeyB:
         return PrivateKeyA
@@ -58,8 +58,4 @@ while True:
     clientSocket.send(msgcripto.encode())
 
     Thread(target=HandleRequest, args=(clientSocket, clientAddr)).start()
-
-
-
-# teste
 
