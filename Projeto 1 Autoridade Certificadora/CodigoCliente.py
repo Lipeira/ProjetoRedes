@@ -9,9 +9,11 @@ mClientSocket = socket(AF_INET, SOCK_STREAM)
 # Colocando o socket para realizar solicitações
 mClientSocket.connect(('localhost', 1235))
 
+
+# Recebendo chave gerada pelo servidor
 data = mClientSocket.recv(2048)
-ChavePrivada = data.decode()
-print(f"Sua chave privada é de: {ChavePrivada}")
+Chave = data.decode()
+print(f"Sua chave privada é de: {Chave}")
 
 
 # Loop para o cliente enviar inúmeras solicitações/mensagens/arquivos

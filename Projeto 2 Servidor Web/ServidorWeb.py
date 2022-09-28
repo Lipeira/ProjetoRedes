@@ -13,6 +13,7 @@ for i in range(2):
     #Recebendo dados do cliente
     data = clientSocket.recv(2048)
     print(f'{data.decode()}')
+
     #Respondendo a solicitação
     msgHeader = 'HTTP/1.1 200 OK \r\n' \
                 'Date: Tue, 09 Aug 2022 13:23:35 GMT\r\n' \
@@ -27,8 +28,11 @@ for i in range(2):
               '</html>'
 
     msgHtml = msgHeader + msgBody
-    #msgHtml = htmlMessage.sucesso()
-    #msgHtml = htmlMessage.NaoEncontrado()
+
+    # msgHtml = htmlMessage.sucesso()
+    # msgHtml = htmlMessage.NaoEncontrado()
+    # msgHtml = htmlMessage.Forbidden()
+    # msgHtml = htmlMessage.BadRequest()
 
     clientSocket.send(msgHtml.encode())
     clientSocket.close()

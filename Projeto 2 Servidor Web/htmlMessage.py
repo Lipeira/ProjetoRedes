@@ -3,7 +3,6 @@ from datetime import datetime
 from time import mktime
 
 def sucesso():
-
     now = datetime.now()
     mStamp = mktime(now.timetuple())
 
@@ -24,9 +23,7 @@ def sucesso():
     html += '<meta charset="UTF-8">'
     html += '</head>'
     html += '<body>'
-    html += '<h1>Hello World</h1>'
-    html += '<h2>Hello World</h2>'
-    html += '<h3>Hello World</h3>'
+    html += '<h1>Requisição bem sucedida, o objeto requisitado será enviado!</h1>'
     html += '</body>'
     html += '</html>'
 
@@ -52,7 +49,59 @@ def NaoEncontrado():
     html += '<meta charset="UTF-8">'
     html += '</head>'
     html += '<body>'
-    html += '<h1>Essa requisição não foi encontrada no servidor</h1>'
+    html += '<h1>Essa requisição não foi encontrada no servidor!</h1>'
+    html += '</body>'
+    html += '</html>'
+
+    resposta += html
+    return resposta
+
+def BadRequest():
+    now = datetime.now()
+    mStamp = mktime(now.timetuple())
+
+    resposta = ''
+    resposta += 'HTTP/1.1 400 Bad Request\r\n'
+    resposta += f'Date: {formatdate(timeval=mStamp, localtime=False, usegmt=True)}\r\n'
+    resposta += 'Server: CIn UFPE/0.0.0.1 (Ubuntu)\r\n'
+    # resposta += f'Content-Length: '
+    resposta += 'Content-Type: text/html\r\n'
+    resposta += '\r\n'
+
+    html = ''
+    html += '<html>'
+    html += '<head>'
+    html += '<title>Bad Request - CIn/UFPE</title>'
+    html += '<meta charset="UTF-8">'
+    html += '</head>'
+    html += '<body>'
+    html += '<h1>Mensagem de requisição não entendida pelo servidor, verifique se a mensagem de requisição está com algum erro de sintaxe!</h1>'
+    html += '</body>'
+    html += '</html>'
+
+    resposta += html
+    return resposta
+
+def Forbidden():
+    now = datetime.now()
+    mStamp = mktime(now.timetuple())
+
+    resposta = ''
+    resposta += 'HTTP/1.1 403 Forbidden\r\n'
+    resposta += f'Date: {formatdate(timeval=mStamp, localtime=False, usegmt=True)}\r\n'
+    resposta += 'Server: CIn UFPE/0.0.0.1 (Ubuntu)\r\n'
+    # resposta += f'Content-Length: '
+    resposta += 'Content-Type: text/html\r\n'
+    resposta += '\r\n'
+
+    html = ''
+    html += '<html>'
+    html += '<head>'
+    html += '<title>Forbidden - CIn/UFPE</title>'
+    html += '<meta charset="UTF-8">'
+    html += '</head>'
+    html += '<body>'
+    html += '<h1>Você não possui acesso a este conteúdo, logo, o servidor não pode aceitá-lo!</h1>'
     html += '</body>'
     html += '</html>'
 

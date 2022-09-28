@@ -17,11 +17,11 @@ def diffie_hellman():
     Ra = (Y**A) % X
     Rb = (Y**B) % X
 
-    PrivateKeyA = (Rb**A) % X
-    PrivateKeyB = (Ra**B) % X
+    KeyA = (Rb**A) % X
+    KeyB = (Ra**B) % X
 
-    if PrivateKeyA == PrivateKeyB:
-        return PrivateKeyA
+    if KeyA == KeyB:
+        return KeyA
 
 def HandleRequest(mClientSocket, mClientAddr):
     while True:
@@ -49,15 +49,18 @@ mSocketServer.bind(('127.0.0.1',1235))
 # Colocando o servidor para escutar as solicitações de conexão dos inúmeros clientes
 mSocketServer.listen()
 
+dic = {}
+
 while True:
     # Loop para o servidor conseguir se conectar com vários clientes e colocando-o para aceitar as solicitações de conexão
     clientSocket, clientAddr =  mSocketServer.accept()
     print(f'O servidor aceitou a conexão do Cliente: {clientAddr}')
     
     # Definindo as chaves privadas de cada cliente e criando múltiplas threads para que o servidor consiga responder mais de um cliente por vez.
-    ChavePrivada = diffie_hellman()
-    msgcripto = f"{ChavePrivada}"
+    ChaveGerada = diffie_hellman()
+    msgcripto = f"{ChaveGerada}"
     clientSocket.send(msgcripto.encode())
 
+    dic[ChaveGerada] = clientAddr
     Thread(target=HandleRequest, args=(clientSocket, clientAddr)).start()
 
