@@ -4,6 +4,10 @@ import random
 from socket import socket, AF_INET, SOCK_STREAM
 from threading import Thread
 
+
+# Função diffie hellman para gerar chaves criptografadas para cada cliente 
+# O Diffie Hellman gera chaves assimétricas então temos uma chave pública e privada
+
 def diffie_hellman():
     A = random.randint(1,999999)
     B = random.randint(1,999999)
@@ -21,38 +25,36 @@ def diffie_hellman():
 
 def HandleRequest(mClientSocket, mClientAddr):
     while True:
-        # Este loop foi criado para que o servidor conseguisse receber diversas requisições de
-        # um mesmo cliente, usando a mesma conexão, ou seja, sem que fosse necessária a
-        # criação de uma nova conexão.
+        # Loop para O servidor receber diversas requisições de um mesmo cliente sem criar uma nova conexão
         print('Esperando o próximo pacote ...')
-        # Recebendo os dados do Cliente:
-        # o Servidor irá receber bytes do cliente, sendo necessária a conversão de bytes
-        # para string ou para o tipo desejado.
+
+        # Recebendo os dados do cliente e decodificando para mostrar o que foi recebido por ele
         data = mClientSocket.recv(2048)
         print(f'Requisição recebida de {mClientAddr}')
         req = data.decode()
         print(f'A requisição foi:{req}')
-        # Após receber e processar a requisição o servidor está apto para enviar uma resposta.
+
+        # Servidor mandando uma resposta para o cliente mostrando que o servidor está ativo e funcionando
         rep = 'Hey cliente!'
         mClientSocket.send(rep.encode())
 
-#Passo 1: Criação do socket
+# Criação do socket do servidor
+
 mSocketServer = socket(AF_INET, SOCK_STREAM)
 print(f'Socket criado ...')
-#Passo 2: Transformando o socket em um socket servidor.
-#Dar Bind significa vincular um socket a um endereço
+
+# Vinculando o socket do servidor a um endereço específico
 mSocketServer.bind(('127.0.0.1',1235))
 
-#Colocar o servidor para escutar as solicitações de conexão
+# Colocando o servidor para escutar as solicitações de conexão dos inúmeros clientes
 mSocketServer.listen()
+
 while True:
-    # Este loop foi colocado para que o servidor conseguisse se conectar com vários cliente;
-    # Passo 3: Colocar o servidor para aceitar as solicitações de conexão:
+    # Loop para o servidor conseguir se conectar com vários clientes e colocando-o para aceitar as solicitações de conexão
     clientSocket, clientAddr =  mSocketServer.accept()
     print(f'O servidor aceitou a conexão do Cliente: {clientAddr}')
-    # Passo 4: Criação de múltiplas threads para que o servidor consiga responder mais de
-    # um cliente por vez.
-
+    
+    # Definindo as chaves privadas de cada cliente e criando múltiplas threads para que o servidor consiga responder mais de um cliente por vez.
     ChavePrivada = diffie_hellman()
     msgcripto = f"{ChavePrivada}"
     clientSocket.send(msgcripto.encode())

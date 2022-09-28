@@ -1,6 +1,5 @@
-#Código do cliente
+#Código do cliente usando TCP
 
-#Código TCP
 import random
 from socket import socket, AF_INET, SOCK_STREAM
 
@@ -14,13 +13,19 @@ data = mClientSocket.recv(2048)
 ChavePrivada = data.decode()
 print(f"Sua chave privada é de: {ChavePrivada}")
 
+
+# Loop para o cliente enviar inúmeras solicitações/mensagens/arquivos
+
 while True:
-    # Este loop foi criado apenas para que o cliente conseguisse enviar múltiplas solicitações
-    message = input('>>')
-    #Enviando a mensagem pelo socket criado.
+    message = input('Escreva a mensagem: ')
+
+    # Enviando a mensagem pelo socket criado
     mClientSocket.send(message.encode())
-    #Recebendo as respostas do servidor.
+
+    # Recebendo as respostas do servidor
     data = mClientSocket.recv(2048)
+    
+    # Decodificando a mensagem para mostrar a mensagem recebida
     reply = data.decode()
     print(f'Resposta recebida:{reply}')
 
