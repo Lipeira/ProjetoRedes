@@ -22,3 +22,6 @@ while True:
     data = mClientSocket.recv(2048)
     reply = data.decode()
     print(f'Resposta recebida:{reply}')
+
+# teste
+

@@ -58,3 +58,8 @@ while True:
     clientSocket.send(msgcripto.encode())
 
     Thread(target=HandleRequest, args=(clientSocket, clientAddr)).start()
+
+
+
+# teste
+
