@@ -2,6 +2,8 @@
 
 import random
 from socket import socket, AF_INET, SOCK_STREAM
+import raizesPrimitivas
+
 
 # Criando o socket
 mClientSocket = socket(AF_INET, SOCK_STREAM)
@@ -9,16 +11,41 @@ mClientSocket = socket(AF_INET, SOCK_STREAM)
 # Colocando o socket para realizar solicitações
 mClientSocket.connect(('localhost', 1235))
 
+# # Criando chaves primas e a base ou seja as chaves "p" e "g"
+# p = random.randint(0,999)
+# while raizesPrimitivas.isPrime(p) == False:
+#     p = random.randint(0,999)
 
-# Recebendo chave gerada pelo servidor
-data = mClientSocket.recv(2048)
-Chave = data.decode()
-print(f"Sua chave privada é de: {Chave}")
+# g = raizesPrimitivas.findPrimitive(p)
 
+p = 23
+g = 5
+
+# Enviando as chaves padrões para o servidor
+mClientSocket.send((f'{p} {g}').encode())
+
+# Recebendo resposta do servidor
+resp1 = mClientSocket.recv(2048).decode()
+print(resp1)
+
+valueA = random.randint(0, 999)
+keyA = str((g ** valueA) % p)
+mClientSocket.send(keyA.encode())
+
+ChaveServidor = int(mClientSocket.recv(2048).decode())
+print(f'A chave do servidor recebida foi {ChaveServidor}')
+
+secretKey = (ChaveServidor ** valueA) % p
+print(f'A chave compartilhada é {secretKey}')
+
+mClientSocket.send(str(secretKey).encode())
+
+resposta = mClientSocket.recv(2048)
+sameKey = resposta.decode()
 
 # Loop para o cliente enviar inúmeras solicitações/mensagens/arquivos
 
-while True:
+while True and (sameKey == str(secretKey)):
     message = input('Escreva a mensagem: ')
 
     # Enviando a mensagem pelo socket criado
