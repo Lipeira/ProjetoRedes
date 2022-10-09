@@ -77,11 +77,3 @@ def findPrimitive( n) :
     return -1
  
 
-p = random.randint(0,9999)
-while isPrime(p) == False:
-    p = random.randint(0,9999)
-
-print("Smallest primitive root of",
-         p, "is", findPrimitive(p))
-
-
