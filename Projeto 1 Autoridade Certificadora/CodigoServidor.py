@@ -3,6 +3,7 @@
 import random
 from socket import socket, AF_INET, SOCK_STREAM
 from threading import Thread
+import cryptocode
 
 def HandleRequest(Socket_Client, mClientAddr):
     # Recebendo chaves comuns "p" e "g" geradas pelo cliente
@@ -42,21 +43,29 @@ def HandleRequest(Socket_Client, mClientAddr):
 
     while True:
         # Loop para O servidor receber diversas requisições de um mesmo cliente sem criar uma nova conexão
-        print('Esperando o próximo pacote ...')
+        # print('Esperando o próximo pacote ...')
 
         # Recebendo os dados do cliente e decodificando para mostrar o que foi recebido por ele
+        # A mensagem recebida aqui está criptografada pelo cliente
         data = Socket_Client.recv(2048)
-        print(f'Requisição recebida de {mClientAddr}')
+        # print(f'Requisiçao recebida de {mClientAddr}')
         req = data.decode()
-        print(f'A requisição foi:{req}')
+        print(f'A requisiçao criptografada foi: {req}')
+
+        print()
+
+        # Descriptografando a mensagem
+        DecryptedMessage = cryptocode.decrypt(req, str(secretKey))
+        print(f'A mensagem foi descriptografada e apareceu o seguinte: {DecryptedMessage}')
+
+        print()
 
         # Servidor mandando uma resposta para o cliente mostrando que o servidor está ativo e funcionando
-        rep = 'Hey cliente!'
+        rep = 'Mensagem recebida...'
         Socket_Client.send(rep.encode())
 
 # Criação do socket do servidor
 Socket_Server = socket(AF_INET, SOCK_STREAM)
-print(f'Socket criado ...')
 
 # Vinculando o socket do servidor a um endereço específico
 Socket_Server.bind(('127.0.0.1', 54321))
@@ -68,7 +77,7 @@ Socket_Server.listen()
 while True:
     # Loop para o servidor conseguir se conectar com vários clientes e colocando-o para aceitar as solicitações de conexão
     Socket_Client, clientAddr =  Socket_Server.accept()
-    print(f'O servidor aceitou a conexão do Cliente: {clientAddr}')
+    print(f'O servidor aceitou a conexao do Cliente: {clientAddr}')
     
     Thread(target=HandleRequest, args=(Socket_Client, clientAddr)).start()
 
