@@ -3,7 +3,7 @@
 import random
 from socket import socket, AF_INET, SOCK_STREAM
 import raizesPrimitivas
-
+from Crypto.Cipher import AES
 
 # Criando o socket
 Socket_Client = socket(AF_INET, SOCK_STREAM)
