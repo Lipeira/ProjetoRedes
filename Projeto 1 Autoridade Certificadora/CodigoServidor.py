@@ -31,7 +31,6 @@ def HandleRequest(Socket_Client, mClientAddr):
 
 
     # Gerando chave compartilhada entre o servidor e o cliente
-    global secretKey
     secretKey = (chaveCliente ** valueB) % primo
     print(f'A chave compartilhada: {secretKey}')
 
@@ -65,6 +64,7 @@ def HandleRequest(Socket_Client, mClientAddr):
 
 # Criação do socket do servidor
 Socket_Server = socket(AF_INET, SOCK_STREAM)
+print('Servidor criado...')
 
 # Vinculando o socket do servidor a um endereço específico
 Socket_Server.bind(('127.0.0.1', 54321))
@@ -72,16 +72,18 @@ Socket_Server.bind(('127.0.0.1', 54321))
 # Colocando o servidor para escutar as solicitações de conexão dos inúmeros clientes
 Socket_Server.listen()
 
-# dic = {}
-# contador = 0
+dic = {}
+contador = 0
 
 while True:
     # Loop para o servidor conseguir se conectar com vários clientes e colocando-o para aceitar as solicitações de conexão
     Socket_Client, clientAddr =  Socket_Server.accept()
     print(f'O servidor aceitou a conexao do cliente: {clientAddr}')
 
-    # contador += 1
-    # dic[contador] = secretKey
+    print()
+
+    contador += 1
+    # dic[contador] = secretKey --_> falta resolver a variável não reconhece!!!
     
     Thread(target=HandleRequest, args=(Socket_Client, clientAddr)).start()
 
