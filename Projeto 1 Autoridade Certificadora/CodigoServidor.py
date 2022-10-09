@@ -5,28 +5,38 @@ from socket import socket, AF_INET, SOCK_STREAM
 from threading import Thread
 
 def HandleRequest(Socket_Client, mClientAddr):
+    # Recebendo chaves comuns "p" e "g" geradas pelo cliente
     dados = Socket_Client.recv(2048).decode()
 
+    # Armazenando chaves separadas em duas variáveis sendo primo = "p" e raiz = "g"
     chaves = dados.split()
     primo = int(chaves[0])
     raiz = int(chaves[1])
-
     # print(f'O número primo recebido pelo cliente é {primo} e a raiz primitiva é {raiz}')
+
+    # Confirmando o recebimento das chaves
     resposta = 'Chaves recebidas'
     Socket_Client.send(resposta.encode())
 
+    # Gerando a chave do servidor (chave B) e enviando para o cliente
     valueB = random.randint(0,999)
     keyB = str((raiz ** valueB) % primo)
     Socket_Client.send(keyB.encode())
 
-    chaveCliente = int(Socket_Client.recv(2048).decode())
+
+    # Recebendo chave do cliente (chave A)
+    chaveCliente = int(Socket_Client.recv(2048).decode())   
     # print(f'A chave do cliente recebida foi {chaveCliente}')
 
+
+    # Gerando chave compartilhada entre o servidor e o cliente
     secretKey = (chaveCliente ** valueB) % primo
     print(f'A chave compartilhada: {secretKey}')
 
+    # Enviando chave para o cliente para que checar se é igual
     Socket_Client.send(str(secretKey).encode())
 
+    # Recebendo chave compartilhada do cliente para confirmar se é igual
     respostaCliente = Socket_Client.recv(2048)
     sameKey = respostaCliente.decode()
 
