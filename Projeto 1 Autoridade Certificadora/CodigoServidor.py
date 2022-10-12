@@ -48,8 +48,14 @@ def HandleRequest(Socket_Client, mClientAddr):
     while CodCliente in IDclient:
         CodCliente = str(uuid.uuid4())
 
+
+    escrita = open ('dicionario.txt','a')
+
     IDclient[CodCliente] = sameKey
     print(IDclient)
+
+    with escrita:
+        escrita.write(f'{CodCliente} {sameKey} \n')
 
     msgident = f'>> Seu identificador é: {CodCliente}'
     Socket_Client.send(msgident.encode())
@@ -90,6 +96,15 @@ Socket_Server.bind(('127.0.0.1', 54321))
 Socket_Server.listen()
 
 IDclient = {}
+
+
+leitura = open ('dicionario.txt','r')
+
+with leitura:
+    for linha in leitura:
+        chave, conteudo = linha.split()
+        IDclient[chave] = conteudo
+
 contador = 0
 
 while True:
