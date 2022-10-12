@@ -80,6 +80,7 @@ def HandleRequest(Socket_Client, mClientAddr):
         sameKey = ListDecrypted[1]
         print(f'>> Mensagem descriptografada: {DecryptedMessage}')
         print(f'>> Mensagem Recebida do cliente {CodCliente}')
+        print()
 
         # Servidor mandando uma resposta para o cliente mostrando que o servidor está ativo e funcionando
         rep = '>> Mensagem enviada com sucesso...'
@@ -113,3 +114,4 @@ while True:
     print(f'>> O servidor aceitou a conexao do cliente: {clientAddr}')
     
     Thread(target=HandleRequest, args=(Socket_Client, clientAddr)).start()
+

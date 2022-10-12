@@ -75,3 +75,5 @@ while True:
     # Decodificando a mensagem para mostrar a mensagem recebida
     reply = data.decode()
     print(f'>> {reply}')
+    print()
+
