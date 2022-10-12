@@ -43,7 +43,7 @@ ChaveServidor = int(Socket_Client.recv(2048).decode())
 
 # Gerando as chaves compartilhadas para ambos os lados
 secretKey = (ChaveServidor ** valueA) % p
-print(f'A chave compartilhada: {secretKey}')
+print(f'>> A chave compartilhada: {secretKey}')
 
 # Mandando a chave compartilhada para o servidor para que tenha noção que é igual
 Socket_Client.send(str(secretKey).encode())
@@ -52,10 +52,16 @@ Socket_Client.send(str(secretKey).encode())
 resposta = Socket_Client.recv(2048)
 sameKey = resposta.decode()
 
+# Recebendo o identificador
+data = Socket_Client.recv(2048)
+ident = data.decode()
+print(ident)
+
 # Loop para o cliente enviar inúmeras solicitações/mensagens/arquivos
 while True:
     # Mensagem que o cliente deseja enviar
-    message = input('Escreva a mensagem: ')
+    message = input('>> Escreva a mensagem: ')
+    message = message + f"|{sameKey}"
 
     # Mensagem Criptografada
     EncryptedMessage = cryptocode.encrypt(message, str(secretKey))
@@ -68,5 +74,4 @@ while True:
     
     # Decodificando a mensagem para mostrar a mensagem recebida
     reply = data.decode()
-    print(f'Resposta recebida: {reply}')
-
+    print(f'>> {reply}')
