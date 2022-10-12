@@ -4,6 +4,7 @@ import random
 from socket import socket, AF_INET, SOCK_STREAM
 import raizesPrimitivas
 import cryptocode
+import rsa
 
 # Criando o socket
 Socket_Client = socket(AF_INET, SOCK_STREAM)
