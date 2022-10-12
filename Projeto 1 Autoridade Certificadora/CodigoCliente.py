@@ -12,6 +12,7 @@ Socket_Client = socket(AF_INET, SOCK_STREAM)
 # Colocando o socket para realizar solicitações
 Socket_Client.connect(('localhost', 54321))
 
+(pubKey, privKey) = rsa.newkeys(512)
 
 # Criando chaves primas e a base ou seja as chaves "p" e "g"
 p = random.randint(0, 999)
@@ -68,6 +69,18 @@ while True:
 
     # Enviando a mensagem pelo socket criado
     Socket_Client.send(EncryptedMessage.encode())
+
+    # Fazendo assinatura digital e enviando dados para o servidor verificar
+    sign = rsa.sign(message.encode(), privKey, 'SHA-1')
+
+    # print(sign)
+
+    # verification = rsa.verify(message.encode(), sign, pubKey)
+
+    # print(verification) -----> pq funciona no cliente e no servidor não???
+
+    Socket_Client.send((f'{sign}.....{pubKey}').encode())
+
 
     # Recebendo as respostas do servidor
     data = Socket_Client.recv(2048)

@@ -82,6 +82,21 @@ def HandleRequest(Socket_Client, mClientAddr):
         print(f'>> Mensagem Recebida do cliente {CodCliente}')
         print()
 
+        
+        # Recebendo os dados enviados pelo cliente para verificar a assinatura digital
+        dadosRSA = Socket_Client.recv(2048).decode()
+        dados_RSA = dadosRSA.split('.....')
+
+        assinatura = dados_RSA[0]
+        pubKey = dados_RSA[1]
+
+        # print(pubKey)
+
+        # verification = rsa.verify(DecryptedMessage.encode(), assinatura, rsa.PublicKey(pubKey[0], pubKey[1]))
+
+        # print(verification) --> não funcionando falta verificar....
+
+
         # Servidor mandando uma resposta para o cliente mostrando que o servidor está ativo e funcionando
         rep = '>> Mensagem enviada com sucesso...'
         Socket_Client.send(rep.encode())
