@@ -1,0 +1,132 @@
+body {
+    background: #f7f7f7
+    ;
+}
+
+.photo {
+    border: 1px solid #505050;
+    border-radius: 50%;
+}
+
+#title, .subtitle, .post_title {
+    color: #505050;
+}
+
+.post_title {
+    font-size: 16px;
+    font-style: italic;
+    margin: 0;
+    margin-bottom: 15px;
+}
+
+.post {
+    background: #FFF;
+    padding: 15px;
+    border: 3px solid #505050;
+    margin-bottom: 15px;
+    border-radius: 5px;
+}
+
+.post_content {
+    margin: 0;
+    margin-bottom: 15px;
+}
+
+.post_image {
+    margin-bottom: 15px;
+}
+
+
+/* 
+    ~~~~~~~~~~~~~~~~~~
+     padding e margin: 
+    ~~~~~~~~~~~~~~~~~~
+
+    padding: 10px 5px -> 10px para o eixo Y (vertical ou seja cima e baixo) / 5px para o eixo X (horizontal ou seja esquerda e direita)
+    padding: 15px 10px 5px 0 -> 15px para cima / 10px para direita / 5px para baixo / 0 para esquerda (SEMPRE NESSA ORDEM)
+
+    padding-top: 15px;
+    padding-right: 10px;
+    padding-bottom: 5px;
+    padding-left: 0;
+
+    -------------------------------------
+
+    ~~~~~~~~~~~~~~~~~~
+       background: 
+    ~~~~~~~~~~~~~~~~~~
+
+    .post {
+        background-color: green; -> colocar cor no fundo
+        background-image: url("bg.png"); -> colocar imagem
+        background-position: top; -> alterar posicionamento da imagem
+    }
+
+    FOCO NA COR NO MOMENTO
+
+    .post {
+        background-color: green;
+        background-color: #008800;
+        background: #008000;
+    }
+
+    ~~~~~~~~~~~~~~~~~~
+         border: 
+    ~~~~~~~~~~~~~~~~~~
+
+    o border pode ter 3 valores: largura, cor e estilo!!
+
+    1. largura pode ser em pixel centimetro ou milimetro
+    2. a cor pode ser escrita em ingles como blue ou seu hexadecimal como #000ff
+    3. o estilo pode ser sólido pontilhado tracejado etc
+
+    .post {
+        border: 3px solid blue; 
+        border-top: 2px dotted green; -> muda o topo da borda com largura de 2 px sndo pontilhada com cor verde
+        border-bottom: 4px dashed pink; muda o lado direito com largura de 4px sendo tracejado com cor rosa
+    }
+
+    PODEMOS MUDAR TODOS OS LADOS!!
+
+    .post {
+        border-top: 2px dotted green;
+        border-right: 4px dashed pink
+        border-bottom: 1px solid purple
+        border-left: 4px dotted cyan
+    }
+
+    PODEMOS USAR ASPECTOS NO GERAL TAMBÉM!!!
+
+    .post {
+        border: 3px solid #505050;
+    }
+
+    .post {
+        border-width: 3px;
+        border-color: #505050;
+        border-style: solid;
+    }
+
+    PODEMOS JUNTAR OS LADOS COM ASPECTOS!!
+
+    .post {
+        border-top-width: 3px;
+        border-top-color: blue;
+        border-top-style: solid;
+    }
+
+    ULTIMA PROPRIEDADE!!!
+
+    OBS: border radius permite arredondar os cantos de um elemento!!
+
+    border-radius: 10px;
+
+    border-radius: 50%;
+    
+    border-radius: 10% 20%;
+
+    border-radius: 10% 20% 15% 22%; -> topo direita baixo esquerda
+
+    OBS: se tiver um quadrado e botar o border-radius para 50% ele vira um circulo :)
+*/
+
