@@ -7,6 +7,9 @@ from typing import List
 import cryptocode
 import uuid
 import rsa
+import os
+from cryptography.fernet import Fernet
+import time
 
 def HandleRequest(Socket_Client, mClientAddr):
     # Recebendo chaves comuns "p" e "g" geradas pelo cliente
@@ -67,14 +70,14 @@ def HandleRequest(Socket_Client, mClientAddr):
         # Recebendo os dados do cliente e decodificando para mostrar o que foi recebido por ele
         # A mensagem recebida aqui está criptografada pelo cliente
         data = Socket_Client.recv(2048)
-        # print(f'>> A mensagem criptografada foi: {req}')
+
         req = data.decode()
         print("--- Uma Mensagem foi Recebida ---")
         print(f'>> A mensagem criptografada foi: {req}')
         # Descriptografando a mensagem
         DecryptedMessage = cryptocode.decrypt(req, str(secretKey))
 
-        #Verificação da Identificação do cliente com o segredo compartilhado
+        # Verificação da Identificação do cliente com o segredo compartilhado
         ListDecrypted = DecryptedMessage.split("|")
         DecryptedMessage = ListDecrypted[0]
         sameKey = ListDecrypted[1]
@@ -82,24 +85,52 @@ def HandleRequest(Socket_Client, mClientAddr):
         print(f'>> Mensagem Recebida do cliente {CodCliente}')
         print()
 
-        
         # Recebendo os dados enviados pelo cliente para verificar a assinatura digital
         dadosRSA = Socket_Client.recv(2048).decode()
         dados_RSA = dadosRSA.split('.....')
 
         assinatura = dados_RSA[0]
-        pubKey = dados_RSA[1]
+        newAssinatura = bytes.fromhex(assinatura)
+        pubKey1 = dados_RSA[1]
+        a = pubKey1[10:164]
 
-        # print(pubKey)
+        b = pubKey1.split(' ')
+        aux = b[1]
+        aux1 = aux[0:-1]
+            
+        pubKey = rsa.PublicKey(int(a), int(aux1))
 
-        # verification = rsa.verify(DecryptedMessage.encode(), assinatura, rsa.PublicKey(pubKey[0], pubKey[1]))
+        try:
+            verification = rsa.verify(DecryptedMessage.encode(), newAssinatura, pubKey)
+            if verification == 'SHA-1':
+                print('A verificacao da requisicao concluida. Mensagem considerada autentica e foi assinada/verificada.')
 
-        # print(verification) --> não funcionando falta verificar....
+        except:
+            print('A verificacao falhou. A mensagem nao e autentica e nao pode ser verificada.')
+        
 
+        ############################################################
+        # Projeto 2
+        
+        # Continuar aqui
 
-        # Servidor mandando uma resposta para o cliente mostrando que o servidor está ativo e funcionando
-        rep = '>> Mensagem enviada com sucesso...'
-        Socket_Client.send(rep.encode())
+        dir_path = 'C:/Users/Vitor/Desktop/projetoRedes/ProjetoRedes/Projeto 2 Servidor Web/Teste/Projeto2/servidor/'
+
+        # list file and directories
+        res = os.listdir(dir_path)
+
+        if DecryptedMessage in res:
+            with open(dir_path + DecryptedMessage, 'rb') as file:
+                for data in file.readlines():
+                    Socket_Client.send(data)
+
+                time.sleep(1)
+                rep = 'Arquivo solicitado entregue com sucesso!'
+                Socket_Client.send(rep.encode())
+
+        else:
+            print('O arquivo nao foi encontrado!')
+
 
 # Criação do socket do servidor
 Socket_Server = socket(AF_INET, SOCK_STREAM)
@@ -129,4 +160,3 @@ while True:
     print(f'>> O servidor aceitou a conexao do cliente: {clientAddr}')
     
     Thread(target=HandleRequest, args=(Socket_Client, clientAddr)).start()
-

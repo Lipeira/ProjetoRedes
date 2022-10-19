@@ -1,5 +1,5 @@
 from socket import socket, AF_INET, SOCK_STREAM
-import htmlMessage
+import HtmlMessageIdeia
 
 #1)Criar o socket servidor:
 webServerSocket = socket(AF_INET, SOCK_STREAM)

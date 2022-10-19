@@ -2,7 +2,7 @@ from email.utils import formatdate
 from datetime import datetime
 from time import mktime
 
-def sucesso():
+def sucesso(ContentType,Archive):
     now = datetime.now()
     mStamp = mktime(now.timetuple())
 
@@ -30,7 +30,7 @@ def sucesso():
     resposta += html
     return resposta
 
-def NaoEncontrado():
+def NaoEncontrado(ContentType,Archive):
     now = datetime.now()
     mStamp = mktime(now.timetuple())
 
@@ -56,7 +56,7 @@ def NaoEncontrado():
     resposta += html
     return resposta
 
-def BadRequest():
+def BadRequest(ContentType,Archive):
     now = datetime.now()
     mStamp = mktime(now.timetuple())
 
@@ -82,7 +82,7 @@ def BadRequest():
     resposta += html
     return resposta
 
-def Forbidden():
+def Forbidden(ContentType,Archive):
     now = datetime.now()
     mStamp = mktime(now.timetuple())
 
@@ -107,3 +107,38 @@ def Forbidden():
 
     resposta += html
     return resposta
+
+#Implementação GET para o cliente
+#Archive: paris.jpg, carro.txt
+def Get(Archive):
+
+    #header
+    msg = ''
+    msg += f'GET /{Archive} HTTP/1.1\r\n'
+    msg += f'Host: localhost\r\n'
+    msg += 'Connection: keep-alive\r\n'
+    msg += 'Accept-Language: pt-PT,pt;q=0.9,en-US;q=0.8,en;q=0.7\r\n'
+    msg += '\r\n'
+    
+    return msg
+
+
+def do_GET(self):
+        self.send_response(200)
+        self.send_header('content-type', 'text/html')
+        self.end_headers()
+        self.wfile.write(self.path.encode())
+
+
+# from http.server import HTTPServer, BaseHTTPRequestHandler
+
+# class handleRequest(BaseHTTPRequestHandler):
+#     def do_GET(self):
+#         self.send_response(200)
+#         self.send_header('content-type', 'text/html')
+#         self.end_headers()
+#         self.wfile.write(self.path.encode())
+
+# httpServer = HTTPServer(('localhost',9090), handleRequest)
+# print('O servidor está ativo!')
+# httpServer.serve_forever()

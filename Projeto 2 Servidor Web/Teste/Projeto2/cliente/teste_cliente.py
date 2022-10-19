@@ -5,6 +5,9 @@ from socket import socket, AF_INET, SOCK_STREAM
 import raizesPrimitivas2
 import cryptocode
 import rsa
+import os
+from cryptography.fernet import Fernet
+import time
 
 # Criando o socket
 Socket_Client = socket(AF_INET, SOCK_STREAM)
@@ -61,32 +64,50 @@ print(ident)
 # Loop para o cliente enviar inúmeras solicitações/mensagens/arquivos
 while True:
     # Mensagem que o cliente deseja enviar
-    message = input('>> Escreva a mensagem: ')
-    message = message + f"|{sameKey}"
+    message1 = input('>> Escreva a mensagem: ')
+    message = message1 + f"|{sameKey}"
 
     # Mensagem Criptografada
     EncryptedMessage = cryptocode.encrypt(message, str(secretKey))
 
     # Enviando a mensagem pelo socket criado
     Socket_Client.send(EncryptedMessage.encode())
+    
 
     # Fazendo assinatura digital e enviando dados para o servidor verificar
-    sign = rsa.sign(message.encode(), privKey, 'SHA-1')
+    sign = rsa.sign(message1.encode(), privKey, 'SHA-1')
+    signHex = sign.hex()
 
-    # print(sign)
-
-    # verification = rsa.verify(message.encode(), sign, pubKey)
-
-    # print(verification) -----> pq funciona no cliente e no servidor não???
-
-    Socket_Client.send((f'{sign}.....{pubKey}').encode())
+    Socket_Client.send((f'{signHex}.....{pubKey}').encode())
 
 
-    # Recebendo as respostas do servidor
-    data = Socket_Client.recv(2048)
+    ##############################################
+    # Projeto 2
     
-    # Decodificando a mensagem para mostrar a mensagem recebida
-    reply = data.decode()
-    print(f'>> {reply}')
+    # Continuar aqui
+
+    dir_path = 'C:/Users/Vitor/Desktop/projetoRedes/ProjetoRedes/Projeto 2 Servidor Web/Teste/Projeto2/servidor/'
+
+    # list file and directories
+    res = os.listdir(dir_path)
+
+    if message1 in res:
+        with open(message1, 'wb') as file:
+            while 1:
+                # recebendo arquivo do servidor
+                data = Socket_Client.recv(2048)
+                if data == b'Arquivo solicitado entregue com sucesso!':
+                    break
+                file.write(data)
+
+        print(f'{message1} recebido!\n')
+            
+    else:
+        print('Arquivo solicitado não existe.')
+
     print()
 
+
+# fazer condicional para verificar se o cliente quer ocntinuar a conexao ou nao
+# botar criptografia no arquivo e ver se fernet aguenta 4 clientes seguidos... ver solução q mandei pra thiago
+# ver se o 2048 recebendo do cliente aguetna
