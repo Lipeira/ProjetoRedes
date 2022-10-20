@@ -100,17 +100,14 @@ while True:
         
         # Continuar aqui
 
-        # Recebendo chave para descriptografar o arquivo.
+        # Chave do cliente para arquivo
         with open('filekey.key', 'wb') as filekey:
-            key = Socket_Client.recv(2048)
-            reply = key.decode()
-            msgDescriptografada = cryptocode.decrypt(reply, str(secretKey))
-            print(f'Resposta do servidor: {msgDescriptografada}')
-            dataBytes = msgDescriptografada.encode()
-            filekey.write(dataBytes)
+            key = Socket_Client.recv(2048).decode()
+            msgDescriptografada = cryptocode.decrypt(key, str(secretKey)).encode()
+            filekey.write(msgDescriptografada)
 
 
-        dir_path = 'C:/Users/luism/Desktop/projetoredes/Projeto 2 Servidor Web/Teste/Projeto2/servidor/'
+        dir_path = 'C:/Users/Vitor/Desktop/projetoRedes/ProjetoRedes/Projeto 2 Servidor Web/Teste/Projeto2/servidor/'
 
         # list file and directories
         res = os.listdir(dir_path)

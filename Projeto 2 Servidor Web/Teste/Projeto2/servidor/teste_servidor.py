@@ -139,7 +139,7 @@ def HandleRequest(Socket_Client, mClientAddr):
             # usando a chave gerada
             fernet = Fernet(key)
 
-            dir_path = 'C:/Users/luism/Desktop/projetoredes/Projeto 2 Servidor Web/Teste/Projeto2/servidor/'
+            dir_path = 'C:/Users/Vitor/Desktop/projetoRedes/ProjetoRedes/Projeto 2 Servidor Web/Teste/Projeto2/servidor/'
 
             # list file and directories
             res = os.listdir(dir_path)
