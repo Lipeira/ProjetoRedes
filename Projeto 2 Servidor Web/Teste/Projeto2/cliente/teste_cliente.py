@@ -100,19 +100,19 @@ while True:
         
         # Continuar aqui
 
-        # Chave do cliente para arquivo
-        with open('filekey.key', 'wb') as filekey:
-            key = Socket_Client.recv(2048).decode()
-            msgDescriptografada = cryptocode.decrypt(key, str(secretKey)).encode()
-            filekey.write(msgDescriptografada)
-
-
         dir_path = 'C:/Users/Vitor/Desktop/projetoRedes/ProjetoRedes/Projeto 2 Servidor Web/Teste/Projeto2/servidor/'
 
         # list file and directories
         res = os.listdir(dir_path)
 
         if message1 in res:
+            # Chave do cliente para arquivo
+            with open('filekey.key', 'wb') as filekey:
+                key = Socket_Client.recv(2048).decode()
+                msgDescriptografada = cryptocode.decrypt(key, str(secretKey)).encode()
+                filekey.write(msgDescriptografada)
+            
+            # Recebendo arquivo criptografado
             with open(message1, 'wb') as file:
                 while 1:
                     # recebendo arquivo do servidor
@@ -123,22 +123,21 @@ while True:
 
             print(f'{message1} recebido!\n')
 
-            # abrindo a chave
+            # Abrindo a chave para descriptografar
             with open('filekey.key', 'rb') as filekey:
                 key = filekey.read()
 
-            # usando a chave
+            # Usando a chave
             fernet = Fernet(key)
 
-            # abrindo o arquivo criptografado
+            # Abrindo o arquivo criptografado
             with open(message1, 'rb') as enc_file:
                 encrypted = enc_file.read()
 
-            # descriptografando o arquivo
+            # Descriptografando o arquivo
             decrypted = fernet.decrypt(encrypted)
 
-            # abrindo o arquivo no modo de gravação e
-            # gravando os dados descriptografados
+            # Abrindo o arquivo no modo de gravação e gravando os dados descriptografados
             with open(message1, 'wb') as dec_file:
                 dec_file.write(decrypted)
                 
