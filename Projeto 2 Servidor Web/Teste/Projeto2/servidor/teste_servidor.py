@@ -10,6 +10,7 @@ import rsa
 import os
 from cryptography.fernet import Fernet
 import time
+import HtmlMessageIdeia
 
 def HandleRequest(Socket_Client, mClientAddr):
     # Recebendo chaves comuns "p" e "g" geradas pelo cliente
@@ -114,10 +115,41 @@ def HandleRequest(Socket_Client, mClientAddr):
         
         # Continuar aqui
 
-        dir_path = 'C:/Users/Vitor/Desktop/projetoRedes/ProjetoRedes/Projeto 2 Servidor Web/Teste/Projeto2/servidor/'
+        # geração de chave
+        key = Fernet.generate_key()
+
+        # string a chave em um arquivo
+        with open('filekey.key', 'wb') as filekey:
+            filekey.write(key)
+
+        # abrindo a chave
+        with open('filekey.key', 'rb') as filekey:
+            key = filekey.read()
+            dado = key.decode()
+            msgCriptografada = cryptocode.encrypt(dado, str(secretKey))
+            Socket_Client.send(msgCriptografada.encode())
+
+        # usando a chave gerada
+        fernet = Fernet(key)
+
+        dir_path = 'C:/Users/Vitor/Desktop/Teste2/Teste/Projeto2/servidor/'
 
         # list file and directories
         res = os.listdir(dir_path)
+
+
+        # abrindo o arquivo original para criptografar
+        with open(dir_path + DecryptedMessage, 'rb') as file:
+            original = file.read()
+
+        # criptografar o arquivo
+        encrypted = fernet.encrypt(original)
+
+        # abrir o arquivo no modo de gravação e
+        # gravar os dados criptografados
+        with open(dir_path + DecryptedMessage, 'wb') as encrypted_file:
+            encrypted_file.write(encrypted)
+
 
         if DecryptedMessage in res:
             with open(dir_path + DecryptedMessage, 'rb') as file:
@@ -127,6 +159,18 @@ def HandleRequest(Socket_Client, mClientAddr):
                 time.sleep(1)
                 rep = 'Arquivo solicitado entregue com sucesso!'
                 Socket_Client.send(rep.encode())
+
+            # abrindo o arquivo criptografado
+            with open(dir_path + DecryptedMessage, 'rb') as enc_file:
+                encrypted = enc_file.read()
+
+            # descriptografando o arquivo
+            decrypted = fernet.decrypt(encrypted)
+
+            # abrindo o arquivo no modo de gravação e
+            # gravando os dados descriptografados
+            with open(dir_path + DecryptedMessage, 'wb') as dec_file:
+                dec_file.write(decrypted)
 
         else:
             print('O arquivo nao foi encontrado!')

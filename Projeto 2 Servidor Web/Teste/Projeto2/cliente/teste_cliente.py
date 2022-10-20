@@ -24,7 +24,6 @@ while raizesPrimitivas2.isPrime(p) == False:
 
 g = raizesPrimitivas2.findPrimitive(p)
 
-
 # Enviando as chaves padrões para o servidor
 Socket_Client.send((f'{p} {g}').encode())
 
@@ -86,7 +85,17 @@ while True:
     
     # Continuar aqui
 
-    dir_path = 'C:/Users/Vitor/Desktop/projetoRedes/ProjetoRedes/Projeto 2 Servidor Web/Teste/Projeto2/servidor/'
+    # Recebendo chave para descriptografar o arquivo.
+    with open('filekey.key', 'wb') as filekey:
+        key = Socket_Client.recv(2048)
+        reply = key.decode()
+        msgDescriptografada = cryptocode.decrypt(reply, str(secretKey))
+        print(f'Resposta do servidor: {msgDescriptografada}')
+        dataBytes = msgDescriptografada.encode()
+        filekey.write(dataBytes)
+
+
+    dir_path = 'C:/Users/Vitor/Desktop/Teste2/Teste/Projeto2/servidor/'
 
     # list file and directories
     res = os.listdir(dir_path)
@@ -101,12 +110,30 @@ while True:
                 file.write(data)
 
         print(f'{message1} recebido!\n')
+
+        # abrindo a chave
+        with open('filekey.key', 'rb') as filekey:
+            key = filekey.read()
+
+        # usando a chave
+        fernet = Fernet(key)
+
+         # abrindo o arquivo criptografado
+        with open(message1, 'rb') as enc_file:
+            encrypted = enc_file.read()
+
+        # descriptografando o arquivo
+        decrypted = fernet.decrypt(encrypted)
+
+        # abrindo o arquivo no modo de gravação e
+        # gravando os dados descriptografados
+        with open(message1, 'wb') as dec_file:
+            dec_file.write(decrypted)
             
     else:
         print('Arquivo solicitado não existe.')
 
     print()
-
 
 # fazer condicional para verificar se o cliente quer ocntinuar a conexao ou nao
 # botar criptografia no arquivo e ver se fernet aguenta 4 clientes seguidos... ver solução q mandei pra thiago
