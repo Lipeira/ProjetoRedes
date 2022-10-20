@@ -63,77 +63,92 @@ print(ident)
 # Loop para o cliente enviar inúmeras solicitações/mensagens/arquivos
 while True:
     # Mensagem que o cliente deseja enviar
-    message1 = input('>> Escreva a mensagem: ')
-    message = message1 + f"|{sameKey}"
+    message1 = input('>> Escreva a mensagem (Digite "close" para encerrar a conexão): ')
 
-    # Mensagem Criptografada
-    EncryptedMessage = cryptocode.encrypt(message, str(secretKey))
+    if message1 == "close":
+        message = message1 + f"|{sameKey}"
 
-    # Enviando a mensagem pelo socket criado
-    Socket_Client.send(EncryptedMessage.encode())
-    
+        # Mensagem Criptografada
+        EncryptedMessage = cryptocode.encrypt(message, str(secretKey))
 
-    # Fazendo assinatura digital e enviando dados para o servidor verificar
-    sign = rsa.sign(message1.encode(), privKey, 'SHA-1')
-    signHex = sign.hex()
-
-    Socket_Client.send((f'{signHex}.....{pubKey}').encode())
-
-
-    ##############################################
-    # Projeto 2
-    
-    # Continuar aqui
-
-    # Recebendo chave para descriptografar o arquivo.
-    with open('filekey.key', 'wb') as filekey:
-        key = Socket_Client.recv(2048)
-        reply = key.decode()
-        msgDescriptografada = cryptocode.decrypt(reply, str(secretKey))
-        print(f'Resposta do servidor: {msgDescriptografada}')
-        dataBytes = msgDescriptografada.encode()
-        filekey.write(dataBytes)
-
-
-    dir_path = 'C:/Users/Vitor/Desktop/Teste2/Teste/Projeto2/servidor/'
-
-    # list file and directories
-    res = os.listdir(dir_path)
-
-    if message1 in res:
-        with open(message1, 'wb') as file:
-            while 1:
-                # recebendo arquivo do servidor
-                data = Socket_Client.recv(2048)
-                if data == b'Arquivo solicitado entregue com sucesso!':
-                    break
-                file.write(data)
-
-        print(f'{message1} recebido!\n')
-
-        # abrindo a chave
-        with open('filekey.key', 'rb') as filekey:
-            key = filekey.read()
-
-        # usando a chave
-        fernet = Fernet(key)
-
-         # abrindo o arquivo criptografado
-        with open(message1, 'rb') as enc_file:
-            encrypted = enc_file.read()
-
-        # descriptografando o arquivo
-        decrypted = fernet.decrypt(encrypted)
-
-        # abrindo o arquivo no modo de gravação e
-        # gravando os dados descriptografados
-        with open(message1, 'wb') as dec_file:
-            dec_file.write(decrypted)
-            
+        # Enviando a mensagem pelo socket criado
+        Socket_Client.send(EncryptedMessage.encode())
+        
+        Socket_Client.close()
+        
+        print("Conexão Finalizada!")
+        break
     else:
-        print('Arquivo solicitado não existe.')
+        message = message1 + f"|{sameKey}"
 
-    print()
+        # Mensagem Criptografada
+        EncryptedMessage = cryptocode.encrypt(message, str(secretKey))
+
+        # Enviando a mensagem pelo socket criado
+        Socket_Client.send(EncryptedMessage.encode())
+        
+
+        # Fazendo assinatura digital e enviando dados para o servidor verificar
+        sign = rsa.sign(message1.encode(), privKey, 'SHA-1')
+        signHex = sign.hex()
+
+        Socket_Client.send((f'{signHex}.....{pubKey}').encode())
+
+
+        ##############################################
+        # Projeto 2
+        
+        # Continuar aqui
+
+        # Recebendo chave para descriptografar o arquivo.
+        with open('filekey.key', 'wb') as filekey:
+            key = Socket_Client.recv(2048)
+            reply = key.decode()
+            msgDescriptografada = cryptocode.decrypt(reply, str(secretKey))
+            print(f'Resposta do servidor: {msgDescriptografada}')
+            dataBytes = msgDescriptografada.encode()
+            filekey.write(dataBytes)
+
+
+        dir_path = 'C:/Users/luism/Desktop/projetoredes/Projeto 2 Servidor Web/Teste/Projeto2/servidor/'
+
+        # list file and directories
+        res = os.listdir(dir_path)
+
+        if message1 in res:
+            with open(message1, 'wb') as file:
+                while 1:
+                    # recebendo arquivo do servidor
+                    data = Socket_Client.recv(2048)
+                    if data == b'Arquivo solicitado entregue com sucesso!':
+                        break
+                    file.write(data)
+
+            print(f'{message1} recebido!\n')
+
+            # abrindo a chave
+            with open('filekey.key', 'rb') as filekey:
+                key = filekey.read()
+
+            # usando a chave
+            fernet = Fernet(key)
+
+            # abrindo o arquivo criptografado
+            with open(message1, 'rb') as enc_file:
+                encrypted = enc_file.read()
+
+            # descriptografando o arquivo
+            decrypted = fernet.decrypt(encrypted)
+
+            # abrindo o arquivo no modo de gravação e
+            # gravando os dados descriptografados
+            with open(message1, 'wb') as dec_file:
+                dec_file.write(decrypted)
+                
+        else:
+            print('Arquivo solicitado não existe.')
+
+        print()
 
 # fazer condicional para verificar se o cliente quer ocntinuar a conexao ou nao
 # botar criptografia no arquivo e ver se fernet aguenta 4 clientes seguidos... ver solução q mandei pra thiago

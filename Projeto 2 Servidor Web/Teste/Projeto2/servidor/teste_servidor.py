@@ -10,7 +10,6 @@ import rsa
 import os
 from cryptography.fernet import Fernet
 import time
-import HtmlMessageIdeia
 
 def HandleRequest(Socket_Client, mClientAddr):
     # Recebendo chaves comuns "p" e "g" geradas pelo cliente
@@ -82,98 +81,106 @@ def HandleRequest(Socket_Client, mClientAddr):
         ListDecrypted = DecryptedMessage.split("|")
         DecryptedMessage = ListDecrypted[0]
         sameKey = ListDecrypted[1]
-        print(f'>> Mensagem descriptografada: {DecryptedMessage}')
-        print(f'>> Mensagem Recebida do cliente {CodCliente}')
-        print()
 
-        # Recebendo os dados enviados pelo cliente para verificar a assinatura digital
-        dadosRSA = Socket_Client.recv(2048).decode()
-        dados_RSA = dadosRSA.split('.....')
+        #Condição close connection
 
-        assinatura = dados_RSA[0]
-        newAssinatura = bytes.fromhex(assinatura)
-        pubKey1 = dados_RSA[1]
-        a = pubKey1[10:164]
-
-        b = pubKey1.split(' ')
-        aux = b[1]
-        aux1 = aux[0:-1]
-            
-        pubKey = rsa.PublicKey(int(a), int(aux1))
-
-        try:
-            verification = rsa.verify(DecryptedMessage.encode(), newAssinatura, pubKey)
-            if verification == 'SHA-1':
-                print('A verificacao da requisicao concluida. Mensagem considerada autentica e foi assinada/verificada.')
-
-        except:
-            print('A verificacao falhou. A mensagem nao e autentica e nao pode ser verificada.')
-        
-
-        ############################################################
-        # Projeto 2
-        
-        # Continuar aqui
-
-        # geração de chave
-        key = Fernet.generate_key()
-
-        # string a chave em um arquivo
-        with open('filekey.key', 'wb') as filekey:
-            filekey.write(key)
-
-        # abrindo a chave
-        with open('filekey.key', 'rb') as filekey:
-            key = filekey.read()
-            dado = key.decode()
-            msgCriptografada = cryptocode.encrypt(dado, str(secretKey))
-            Socket_Client.send(msgCriptografada.encode())
-
-        # usando a chave gerada
-        fernet = Fernet(key)
-
-        dir_path = 'C:/Users/Vitor/Desktop/Teste2/Teste/Projeto2/servidor/'
-
-        # list file and directories
-        res = os.listdir(dir_path)
-
-
-        # abrindo o arquivo original para criptografar
-        with open(dir_path + DecryptedMessage, 'rb') as file:
-            original = file.read()
-
-        # criptografar o arquivo
-        encrypted = fernet.encrypt(original)
-
-        # abrir o arquivo no modo de gravação e
-        # gravar os dados criptografados
-        with open(dir_path + DecryptedMessage, 'wb') as encrypted_file:
-            encrypted_file.write(encrypted)
-
-
-        if DecryptedMessage in res:
-            with open(dir_path + DecryptedMessage, 'rb') as file:
-                for data in file.readlines():
-                    Socket_Client.send(data)
-
-                time.sleep(1)
-                rep = 'Arquivo solicitado entregue com sucesso!'
-                Socket_Client.send(rep.encode())
-
-            # abrindo o arquivo criptografado
-            with open(dir_path + DecryptedMessage, 'rb') as enc_file:
-                encrypted = enc_file.read()
-
-            # descriptografando o arquivo
-            decrypted = fernet.decrypt(encrypted)
-
-            # abrindo o arquivo no modo de gravação e
-            # gravando os dados descriptografados
-            with open(dir_path + DecryptedMessage, 'wb') as dec_file:
-                dec_file.write(decrypted)
+        if DecryptedMessage == "close":
+            print(f"A conexão com o cliente {CodCliente} foi finalizada.")
+            break
 
         else:
-            print('O arquivo nao foi encontrado!')
+            print(f'>> Mensagem descriptografada: {DecryptedMessage}')
+            print(f'>> Mensagem Recebida do cliente {CodCliente}')
+            print()
+
+            # Recebendo os dados enviados pelo cliente para verificar a assinatura digital
+            dadosRSA = Socket_Client.recv(2048).decode()
+            dados_RSA = dadosRSA.split('.....')
+
+            assinatura = dados_RSA[0]
+            newAssinatura = bytes.fromhex(assinatura)
+            pubKey1 = dados_RSA[1]
+            a = pubKey1[10:164]
+
+            b = pubKey1.split(' ')
+            aux = b[1]
+            aux1 = aux[0:-1]
+                
+            pubKey = rsa.PublicKey(int(a), int(aux1))
+
+            try:
+                verification = rsa.verify(DecryptedMessage.encode(), newAssinatura, pubKey)
+                if verification == 'SHA-1':
+                    print('A verificacao da requisicao concluida. Mensagem considerada autentica e foi assinada/verificada.')
+
+            except:
+                print('A verificacao falhou. A mensagem nao e autentica e nao pode ser verificada.')
+            
+
+            ############################################################
+            # Projeto 2
+            
+            # Continuar aqui
+
+            # geração de chave
+            key = Fernet.generate_key()
+
+            # string a chave em um arquivo
+            with open('filekey.key', 'wb') as filekey:
+                filekey.write(key)
+
+            # abrindo a chave
+            with open('filekey.key', 'rb') as filekey:
+                key = filekey.read()
+                dado = key.decode()
+                msgCriptografada = cryptocode.encrypt(dado, str(secretKey))
+                Socket_Client.send(msgCriptografada.encode())
+
+            # usando a chave gerada
+            fernet = Fernet(key)
+
+            dir_path = 'C:/Users/luism/Desktop/projetoredes/Projeto 2 Servidor Web/Teste/Projeto2/servidor/'
+
+            # list file and directories
+            res = os.listdir(dir_path)
+
+
+            # abrindo o arquivo original para criptografar
+            with open(dir_path + DecryptedMessage, 'rb') as file:
+                original = file.read()
+
+            # criptografar o arquivo
+            encrypted = fernet.encrypt(original)
+
+            # abrir o arquivo no modo de gravação e
+            # gravar os dados criptografados
+            with open(dir_path + DecryptedMessage, 'wb') as encrypted_file:
+                encrypted_file.write(encrypted)
+
+
+            if DecryptedMessage in res:
+                with open(dir_path + DecryptedMessage, 'rb') as file:
+                    for data in file.readlines():
+                        Socket_Client.send(data)
+
+                    time.sleep(1)
+                    rep = 'Arquivo solicitado entregue com sucesso!'
+                    Socket_Client.send(rep.encode())
+
+                # abrindo o arquivo criptografado
+                with open(dir_path + DecryptedMessage, 'rb') as enc_file:
+                    encrypted = enc_file.read()
+
+                # descriptografando o arquivo
+                decrypted = fernet.decrypt(encrypted)
+
+                # abrindo o arquivo no modo de gravação e
+                # gravando os dados descriptografados
+                with open(dir_path + DecryptedMessage, 'wb') as dec_file:
+                    dec_file.write(decrypted)
+
+            else:
+                print('O arquivo nao foi encontrado!')
 
 
 # Criação do socket do servidor
