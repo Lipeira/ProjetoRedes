@@ -108,9 +108,9 @@ while True:
         if message1 in res:
             # Chave do cliente para arquivo
             with open('filekey.key', 'wb') as filekey:
-                key = Socket_Client.recv(2048).decode()
-                msgDescriptografada = cryptocode.decrypt(key, str(secretKey)).encode()
-                filekey.write(msgDescriptografada)
+                chaveArq = Socket_Client.recv(2048).decode()
+                msg = cryptocode.decrypt(chaveArq, str(secretKey)).encode()
+                filekey.write(msg)
             
             # Recebendo arquivo criptografado
             with open(message1, 'wb') as file:
