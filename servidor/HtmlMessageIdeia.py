@@ -2,7 +2,7 @@ from email.utils import formatdate
 from datetime import datetime
 from time import mktime
 
-def sucesso(ContentType,Archive):
+def sucesso():
     now = datetime.now()
     mStamp = mktime(now.timetuple())
 
@@ -13,7 +13,6 @@ def sucesso(ContentType,Archive):
     resposta += 'Server: CIn UFPE/0.0.0.1 (Ubuntu)\r\n'
     # resposta += f'Content-Length: '
     resposta += 'Content-Type: text/html\r\n'
-    resposta += '\r\n'
 
     #mensagem
     html = ''
@@ -30,7 +29,7 @@ def sucesso(ContentType,Archive):
     resposta += html
     return resposta
 
-def NaoEncontrado(ContentType,Archive):
+def NaoEncontrado():
     now = datetime.now()
     mStamp = mktime(now.timetuple())
 
@@ -40,7 +39,6 @@ def NaoEncontrado(ContentType,Archive):
     resposta += 'Server: CIn UFPE/0.0.0.1 (Ubuntu)\r\n'
     # resposta += f'Content-Length: '
     resposta += 'Content-Type: text/html\r\n'
-    resposta += '\r\n'
 
     html = ''
     html += '<html>'
@@ -56,7 +54,7 @@ def NaoEncontrado(ContentType,Archive):
     resposta += html
     return resposta
 
-def BadRequest(ContentType,Archive):
+def BadRequest():
     now = datetime.now()
     mStamp = mktime(now.timetuple())
 
@@ -66,7 +64,6 @@ def BadRequest(ContentType,Archive):
     resposta += 'Server: CIn UFPE/0.0.0.1 (Ubuntu)\r\n'
     # resposta += f'Content-Length: '
     resposta += 'Content-Type: text/html\r\n'
-    resposta += '\r\n'
 
     html = ''
     html += '<html>'
@@ -82,7 +79,7 @@ def BadRequest(ContentType,Archive):
     resposta += html
     return resposta
 
-def Forbidden(ContentType,Archive):
+def Forbidden():
     now = datetime.now()
     mStamp = mktime(now.timetuple())
 
@@ -92,7 +89,6 @@ def Forbidden(ContentType,Archive):
     resposta += 'Server: CIn UFPE/0.0.0.1 (Ubuntu)\r\n'
     # resposta += f'Content-Length: '
     resposta += 'Content-Type: text/html\r\n'
-    resposta += '\r\n'
 
     html = ''
     html += '<html>'
@@ -108,37 +104,3 @@ def Forbidden(ContentType,Archive):
     resposta += html
     return resposta
 
-#Implementação GET para o cliente
-#Archive: paris.jpg, carro.txt
-def Get(Archive):
-
-    #header
-    msg = ''
-    msg += f'GET /{Archive} HTTP/1.1\r\n'
-    msg += f'Host: localhost\r\n'
-    msg += 'Connection: keep-alive\r\n'
-    msg += 'Accept-Language: pt-PT,pt;q=0.9,en-US;q=0.8,en;q=0.7\r\n'
-    msg += '\r\n'
-    
-    return msg
-
-
-def do_GET(self):
-        self.send_response(200)
-        self.send_header('content-type', 'text/html')
-        self.end_headers()
-        self.wfile.write(self.path.encode())
-
-
-# from http.server import HTTPServer, BaseHTTPRequestHandler
-
-# class handleRequest(BaseHTTPRequestHandler):
-#     def do_GET(self):
-#         self.send_response(200)
-#         self.send_header('content-type', 'text/html')
-#         self.end_headers()
-#         self.wfile.write(self.path.encode())
-
-# httpServer = HTTPServer(('localhost',9090), handleRequest)
-# print('O servidor está ativo!')
-# httpServer.serve_forever()

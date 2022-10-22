@@ -10,6 +10,8 @@ import rsa
 import os
 from cryptography.fernet import Fernet
 import time
+import pathlib
+import HtmlMessageIdeia
 
 def HandleRequest(Socket_Client, mClientAddr):
     # Recebendo chaves comuns "p" e "g" geradas pelo cliente
@@ -63,6 +65,9 @@ def HandleRequest(Socket_Client, mClientAddr):
     msgident = f'>> Seu identificador é: {CodCliente}'
     Socket_Client.send(msgident.encode())
 
+    # Região do cliente para verificar se tem permissão ou não
+    region = Socket_Client.recv(2048).decode()
+
     while IDclient[CodCliente] == sameKey:
         # Loop para O servidor receber diversas requisições de um mesmo cliente sem criar uma nova conexão
         # print('Esperando o próximo pacote ...')
@@ -101,11 +106,10 @@ def HandleRequest(Socket_Client, mClientAddr):
             newAssinatura = bytes.fromhex(assinatura)
             pubKey1 = dados_RSA[1]
             a = pubKey1[10:164]
-
             b = pubKey1.split(' ')
             aux = b[1]
             aux1 = aux[0:-1]
-                
+
             pubKey = rsa.PublicKey(int(a), int(aux1))
 
             try:
@@ -119,65 +123,89 @@ def HandleRequest(Socket_Client, mClientAddr):
 
             ############################################################
             # Projeto 2
-            
+
             # Continuar aqui
 
-            dir_path = 'C:/Users/Vitor/Desktop/projetoRedes/ProjetoRedes/Projeto 2 Servidor Web/Teste/Projeto2/servidor/'
-
-            # Lista contendo todos os diretórios e arquivos do path selecionado
-            res = os.listdir(dir_path)
-
-            # geração de chave
-            key = Fernet.generate_key()
-
-            # Salvando chave em um arquivo
-            with open('filekey.key', 'wb') as filekey:
-                filekey.write(key)
-
-            # Abrindo a chave para enviar para o cliente também
-            with open('filekey.key', 'rb') as filekey:
-                key = filekey.read()
-                dado = key.decode()
-                msgCriptografada = cryptocode.encrypt(dado, str(secretKey))
-                Socket_Client.send(msgCriptografada.encode())
-
-            # Usando a chave gerada
-            fernet = Fernet(key)
-
-            # Abrindo o arquivo original para criptografar
-            with open(dir_path + DecryptedMessage, 'rb') as file:
-                original = file.read()
-
-            # Criptografar o arquivo
-            encrypted = fernet.encrypt(original)
-
-            # Abrindo o arquivo no modo de gravação e gravando os dados criptografados
-            with open(dir_path + DecryptedMessage, 'wb') as encrypted_file:
-                encrypted_file.write(encrypted)
-
-
-            if DecryptedMessage in res:
-                with open(dir_path + DecryptedMessage, 'rb') as file:
-                    for data in file.readlines():
-                        Socket_Client.send(data)
-
-                    time.sleep(1)
-                    rep = 'Arquivo solicitado entregue com sucesso!'
-                    Socket_Client.send(rep.encode())
-
-                # Abrindo o arquivo criptografado
-                with open(dir_path + DecryptedMessage, 'rb') as enc_file:
-                    encrypted = enc_file.read()
-
-                # Descriptografando o arquivo
-                decrypted = fernet.decrypt(encrypted)
-
-                # Abrindo o arquivo no modo de gravação e gravando os dados descriptografados
-                with open(dir_path + DecryptedMessage, 'wb') as dec_file:
-                    dec_file.write(decrypted)
-
+            if region != '1':
+                answer = HtmlMessageIdeia.Forbidden()
+                print('Erro 403')
+                rep403 = answer
+                Socket_Client.send(rep403.encode())
+            
             else:
-                print('O arquivo nao foi encontrado!')
+
+                if "\\" in DecryptedMessage or "/" in DecryptedMessage or "*" in DecryptedMessage or "?" in DecryptedMessage or "<" in DecryptedMessage or ">" in DecryptedMessage or "|" in DecryptedMessage or "." not in DecryptedMessage:
+                    answer = HtmlMessageIdeia.BadRequest()
+                    print('Erro 400')
+                    rep402 = answer
+                    Socket_Client.send(rep402.encode())
+
+                else:
+                    dir_path = str(pathlib.Path(__file__).parent.resolve()) + '/'
+                    dir_path = dir_path.replace('\\', '/')
+                    
+                    # Lista contendo todos os diretórios e arquivos do path selecionado
+                    res = os.listdir(dir_path)
+
+                    if DecryptedMessage in res:
+                        answer = HtmlMessageIdeia.sucesso()
+                        print('200 OK')
+                        rep200 = answer
+                        Socket_Client.send(rep200.encode())
+
+                        # geração de chave
+                        key = Fernet.generate_key()
+
+                        # Salvando chave em um arquivo
+                        with open('filekey.key', 'wb') as filekey:
+                            filekey.write(key)
+
+                        # Abrindo a chave para enviar para o cliente também
+                        with open('filekey.key', 'rb') as filekey:
+                            key = filekey.read()
+                            dado = key.decode()
+                            msgCriptografada = cryptocode.encrypt(dado, str(secretKey))
+                            Socket_Client.send(msgCriptografada.encode())
+
+                        # Usando a chave gerada
+                        fernet = Fernet(key)
+
+                        # Abrindo o arquivo original para criptografar
+                        with open(dir_path + DecryptedMessage, 'rb') as file:
+                            original = file.read()
+
+                        # Criptografar o arquivo
+                        encrypted = fernet.encrypt(original)
+
+                        # Abrindo o arquivo no modo de gravação e gravando os dados criptografados
+                        with open(dir_path + DecryptedMessage, 'wb') as encrypted_file:
+                            encrypted_file.write(encrypted)
+
+                    
+                        with open(dir_path + DecryptedMessage, 'rb') as file:
+                            for data in file.readlines():
+                                Socket_Client.send(data)
+
+                            time.sleep(1)
+                            rep = 'Arquivo solicitado entregue com sucesso!'
+                            Socket_Client.send(rep.encode())
+
+                        # Abrindo o arquivo criptografado
+                        with open(dir_path + DecryptedMessage, 'rb') as enc_file:
+                            encrypted = enc_file.read()
+
+                        # Descriptografando o arquivo
+                        decrypted = fernet.decrypt(encrypted)
+
+                        # Abrindo o arquivo no modo de gravação e gravando os dados descriptografados
+                        with open(dir_path + DecryptedMessage, 'wb') as dec_file:
+                            dec_file.write(decrypted)
+
+                    else:
+                        answer = HtmlMessageIdeia.NaoEncontrado()
+                        print('Erro 404')
+                        rep404 = answer
+                        Socket_Client.send(rep404.encode())
 
 
 # Criação do socket do servidor
