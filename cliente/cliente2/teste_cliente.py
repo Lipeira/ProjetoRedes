@@ -60,6 +60,12 @@ data = Socket_Client.recv(2048)
 ident = data.decode()
 print(ident)
 
+# Armazenando unicamente o identificador
+identificador = ident.split()
+identify = identificador[-1]
+
+
+# Recebendo informações sobre a região do cliente
 print('''De qual região você está mandando mensagem: 
     [1] América do Sul
     [2] América do Norte
@@ -71,22 +77,24 @@ print('''De qual região você está mandando mensagem:
     
     OBS: todas as regiões com exceção da AMÉRICA DO SUL (número 1) estão com acesso restrito''')
 
-regiao = input('>')
+regiao = input('Digite o número: ')
 
 Socket_Client.send(regiao.encode())
 
 # Loop para o cliente enviar inúmeras solicitações/mensagens/arquivos
 while True:
+    print()
     # Mensagem que o cliente deseja enviar
     print('''Escolha um dos arquivos para receber: 
     [1] Paris.jpg 
     [2] postagem.png
-    [3] index.html
+    [3] teste.pdf
 
     OBS: a escrita incorreta ou o nome de um arquivo não listado irá ocasionar erro e será solicitado novamente o arquivo desejado''')
-
-    message1 = input('>>(Digite "close" para encerrar a conexão): ')
-
+    print()
+    message1 = input('Escreva o nome do arquivo desejado (Digite "close" para encerrar a conexão): ')
+    print()
+    # Verificação para fechar a conexão do cliente com o servidor
     if message1 == "close":
         message = message1 + f"|{sameKey}"
 
@@ -100,6 +108,8 @@ while True:
         
         print("Conexão Finalizada!")
         break
+
+    # Continuando caso deseje mandar outras requisições
     else:
         message = message1 + f"|{sameKey}"
 
@@ -122,15 +132,17 @@ while True:
         
         # Continuar aqui
 
+        # Recebendo código de erro/confirmação do servidor
         code = Socket_Client.recv(2048).decode()
         codeSplit = code.split()
 
+        # Se o código for 200 irá receber o arquivo criptografado e descriptografar para a visualização
         if codeSplit[1] == '200':
 
             print(code)
 
             # Chave do cliente para arquivo
-            with open('filekey.key', 'wb') as filekey:
+            with open(str(identify) + '.key', 'wb') as filekey:
                 chaveArq = Socket_Client.recv(2048).decode()
                 msg = cryptocode.decrypt(chaveArq, str(secretKey)).encode()
                 filekey.write(msg)
@@ -139,7 +151,7 @@ while True:
             with open(message1, 'wb') as file:
                 while 1:
                     # recebendo arquivo do servidor
-                    data = Socket_Client.recv(2048)
+                    data = Socket_Client.recv(1000000)
                     if data == b'Arquivo solicitado entregue com sucesso!':
                         break
                     file.write(data)
@@ -147,7 +159,7 @@ while True:
             print(f'{message1} recebido!\n')
 
             # Abrindo a chave para descriptografar
-            with open('filekey.key', 'rb') as filekey:
+            with open(str(identify) + '.key', 'rb') as filekey:
                 key = filekey.read()
 
             # Usando a chave
@@ -164,6 +176,7 @@ while True:
             with open(message1, 'wb') as dec_file:
                 dec_file.write(decrypted)
         
+        # Caso não retorne o código 200 irá gerar os erros específicos
         elif codeSplit[1] == '403':
             print(code)
 
@@ -173,7 +186,10 @@ while True:
         else:
             print(code)
 
-        print()
+
+
+# COMENTÁRIOS PARA MELHORAR CÓDIGO
+
 
 # fazer condicional para verificar se o cliente quer ocntinuar a conexao ou nao
 # botar criptografia no arquivo e ver se fernet aguenta 4 clientes seguidos... ver solução q mandei pra thiago
