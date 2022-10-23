@@ -147,11 +147,11 @@ while True:
 
             print(code)
 
-            # Chave do cliente para arquivo
-            with open(str(identify) + '.key', 'wb') as filekey:
+            # Recebendo chave do cliente para descriptografar o arquivo que recebeu criptografado
+            with open(str(identify) + '.key', 'wb') as file_chave:
                 chaveArq = Socket_Client.recv(2048).decode()
                 msg = cryptocode.decrypt(chaveArq, str(secretKey)).encode()
-                filekey.write(msg)
+                file_chave.write(msg)
             
             # Recebendo arquivo criptografado
             with open(message1, 'wb') as file:
@@ -164,23 +164,23 @@ while True:
 
             print(f'{message1} recebido!\n')
 
-            # Abrindo a chave para descriptografar
-            with open(str(identify) + '.key', 'rb') as filekey:
-                key = filekey.read()
+            # Abrindo a chave para descriptografar arquivos
+            with open(str(identify) + '.key', 'rb') as file_chave:
+                chaveArq = file_chave.read()
 
-            # Usando a chave
-            fernet = Fernet(key)
+            # Usando a chave da biblioteca Fernet para começar descriptografar
+            fernetKey = Fernet(chaveArq)
 
             # Abrindo o arquivo criptografado
-            with open(message1, 'rb') as enc_file:
-                encrypted = enc_file.read()
+            with open(message1, 'rb') as fileEncrypt:
+                encriptado = fileEncrypt.read()
 
             # Descriptografando o arquivo
-            decrypted = fernet.decrypt(encrypted)
+            descriptado = fernetKey.decrypt(encriptado)
 
-            # Abrindo o arquivo no modo de gravação e gravando os dados descriptografados
-            with open(message1, 'wb') as dec_file:
-                dec_file.write(decrypted)
+            # Abrindo o arquivo no modo de gravação e gravando os dados descriptografados no próprio arquivo (substituindo)
+            with open(message1, 'wb') as fileDecrypt:
+                fileDecrypt.write(descriptado)
         
         # Caso não retorne o código 200 irá gerar os erros específicos
         elif codeSplit[1] == '403':
