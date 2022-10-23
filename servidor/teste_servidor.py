@@ -120,6 +120,7 @@ def HandleRequest(Socket_Client, mClientAddr):
 
         if DecryptedMessage == "close":
             print(f"A conexão com o cliente {CodCliente} foi finalizada.")
+            ClientesConectados.remove(CodCliente)
             break
 
         else:
