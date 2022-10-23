@@ -60,8 +60,8 @@ resposta = Socket_Client.recv(2048)
 sameKey = resposta.decode()
 
 # Recebendo o identificador
-data = Socket_Client.recv(2048)
-ident = data.decode()
+data = Socket_Client.recv(2048).decode()
+ident = cryptocode.decrypt(data, str(secretKey))
 print(ident)
 
 # Armazenando unicamente o identificador
@@ -83,7 +83,7 @@ print('''De qual região você está mandando mensagem:
 
 regiao = input('Digite o número: ')
 
-Socket_Client.send(regiao.encode())
+Socket_Client.send((cryptocode.encrypt(regiao, str(secretKey))).encode())
 
 LimparConsole()
 
@@ -140,6 +140,8 @@ while True:
 
         # Recebendo código de erro/confirmação do servidor
         code = Socket_Client.recv(2048).decode()
+        code1 = cryptocode.decrypt(code, str(secretKey))
+        code = code1
         codeSplit = code.split()
 
         # Se o código for 200 irá receber o arquivo criptografado e descriptografar para a visualização

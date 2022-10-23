@@ -84,7 +84,7 @@ def HandleRequest(Socket_Client, mClientAddr):
         escrita.write(f'{CodCliente} {sameKey} \n')
 
     msgident = f'>> Seu identificador é: {CodCliente}'
-    Socket_Client.send(msgident.encode())
+    Socket_Client.send((cryptocode.encrypt(msgident, str(secretKey))).encode())
 
     ClientesConectados.append(CodCliente)
     LimparConsole()
@@ -92,7 +92,8 @@ def HandleRequest(Socket_Client, mClientAddr):
     print(f"Novo Cliente Conectado: {CodCliente}")
 
     # Região do cliente para verificar se tem permissão ou não
-    region = Socket_Client.recv(2048).decode()
+    region1 = Socket_Client.recv(2048).decode()
+    region = cryptocode.decrypt(region1, str(secretKey))
 
     while IDclient[CodCliente] == sameKey:
         # Loop para O servidor receber diversas requisições de um mesmo cliente sem criar uma nova conexão
@@ -163,7 +164,7 @@ def HandleRequest(Socket_Client, mClientAddr):
             if region != '1':
                 answer = HtmlMessageIdeia.Forbidden()
                 print('Erro 403')
-                rep403 = answer
+                rep403 = cryptocode.encrypt(answer, str(secretKey))
                 Socket_Client.send(rep403.encode())
             
             else:
@@ -178,7 +179,7 @@ def HandleRequest(Socket_Client, mClientAddr):
                     if "\\" in DecryptedMessage or "/" in DecryptedMessage or "*" in DecryptedMessage or "?" in DecryptedMessage or "<" in DecryptedMessage or ">" in DecryptedMessage or "|" in DecryptedMessage or "." not in DecryptedMessage or "'" in DecryptedMessage or '"' in DecryptedMessage:
                         answer = HtmlMessageIdeia.BadRequest()
                         print('Erro 400')
-                        rep402 = answer
+                        rep402 = cryptocode.encrypt(answer, str(secretKey))
                         Socket_Client.send(rep402.encode())
 
                     else:
@@ -193,7 +194,7 @@ def HandleRequest(Socket_Client, mClientAddr):
                         if DecryptedMessage in res:
                             answer = HtmlMessageIdeia.sucesso()
                             print('200 OK')
-                            rep200 = answer
+                            rep200 = cryptocode.encrypt(answer, str(secretKey))
                             Socket_Client.send(rep200.encode())
 
                             # Geração da chave a ser usada pela biblioteca Fernet para criptografar arquivos
@@ -247,14 +248,14 @@ def HandleRequest(Socket_Client, mClientAddr):
                         else:
                             answer = HtmlMessageIdeia.NaoEncontrado()
                             print('Erro 404')
-                            rep404 = answer
+                            rep404 = cryptocode.encrypt(answer, str(secretKey))
                             Socket_Client.send(rep404.encode())
 
                 # Se a mensagem se perder no caminho ou a assinatura digital/chave pública se corromperem irá dar 403 forbidden também
                 except:
                     answer = HtmlMessageIdeia.Forbidden()
                     print('Erro 403')
-                    rep403 = answer
+                    rep403 = cryptocode.encrypt(answer, str(secretKey))
                     Socket_Client.send(rep403.encode())
                     print('A verificacao falhou. A mensagem nao pode ser verificada.')
             

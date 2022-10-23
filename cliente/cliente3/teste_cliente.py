@@ -9,6 +9,9 @@ import os
 from cryptography.fernet import Fernet
 import time
 
+def LimparConsole():
+    os.system("cls")
+
 # Criando o socket
 Socket_Client = socket(AF_INET, SOCK_STREAM)
 
@@ -44,6 +47,7 @@ ChaveServidor = int(Socket_Client.recv(2048).decode())
 # print(f'A chave do servidor recebida foi {ChaveServidor}')
 
 
+LimparConsole()
 # Gerando as chaves compartilhadas para ambos os lados
 secretKey = (ChaveServidor ** valueA) % p
 print(f'>> A chave compartilhada: {secretKey}')
@@ -56,8 +60,8 @@ resposta = Socket_Client.recv(2048)
 sameKey = resposta.decode()
 
 # Recebendo o identificador
-data = Socket_Client.recv(2048)
-ident = data.decode()
+data = Socket_Client.recv(2048).decode()
+ident = cryptocode.decrypt(data, str(secretKey))
 print(ident)
 
 # Armazenando unicamente o identificador
@@ -79,7 +83,9 @@ print('''De qual região você está mandando mensagem:
 
 regiao = input('Digite o número: ')
 
-Socket_Client.send(regiao.encode())
+Socket_Client.send((cryptocode.encrypt(regiao, str(secretKey))).encode())
+
+LimparConsole()
 
 # Loop para o cliente enviar inúmeras solicitações/mensagens/arquivos
 while True:
@@ -134,6 +140,8 @@ while True:
 
         # Recebendo código de erro/confirmação do servidor
         code = Socket_Client.recv(2048).decode()
+        code1 = cryptocode.decrypt(code, str(secretKey))
+        code = code1
         codeSplit = code.split()
 
         # Se o código for 200 irá receber o arquivo criptografado e descriptografar para a visualização
@@ -141,11 +149,11 @@ while True:
 
             print(code)
 
-            # Chave do cliente para arquivo
-            with open(str(identify) + '.key', 'wb') as filekey:
+            # Recebendo chave do cliente para descriptografar o arquivo que recebeu criptografado
+            with open(str(identify) + '.key', 'wb') as file_chave:
                 chaveArq = Socket_Client.recv(2048).decode()
                 msg = cryptocode.decrypt(chaveArq, str(secretKey)).encode()
-                filekey.write(msg)
+                file_chave.write(msg)
             
             # Recebendo arquivo criptografado
             with open(message1, 'wb') as file:
@@ -158,23 +166,23 @@ while True:
 
             print(f'{message1} recebido!\n')
 
-            # Abrindo a chave para descriptografar
-            with open(str(identify) + '.key', 'rb') as filekey:
-                key = filekey.read()
+            # Abrindo a chave para descriptografar arquivos
+            with open(str(identify) + '.key', 'rb') as file_chave:
+                chaveArq = file_chave.read()
 
-            # Usando a chave
-            fernet = Fernet(key)
+            # Usando a chave da biblioteca Fernet para começar descriptografar
+            fernetKey = Fernet(chaveArq)
 
             # Abrindo o arquivo criptografado
-            with open(message1, 'rb') as enc_file:
-                encrypted = enc_file.read()
+            with open(message1, 'rb') as fileEncrypt:
+                encriptado = fileEncrypt.read()
 
             # Descriptografando o arquivo
-            decrypted = fernet.decrypt(encrypted)
+            descriptado = fernetKey.decrypt(encriptado)
 
-            # Abrindo o arquivo no modo de gravação e gravando os dados descriptografados
-            with open(message1, 'wb') as dec_file:
-                dec_file.write(decrypted)
+            # Abrindo o arquivo no modo de gravação e gravando os dados descriptografados no próprio arquivo (substituindo)
+            with open(message1, 'wb') as fileDecrypt:
+                fileDecrypt.write(descriptado)
         
         # Caso não retorne o código 200 irá gerar os erros específicos
         elif codeSplit[1] == '403':
@@ -214,4 +222,3 @@ while True:
 # 5 - sim, só dar import no html message dela e usar para printar
 # 6 - pathfile lab para deixar um path genérico independente de quem acessar!! -> falar com thiago depois,.....
 # ---> pathlib absolute() swap \\ para /
-
