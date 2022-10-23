@@ -9,6 +9,9 @@ import os
 from cryptography.fernet import Fernet
 import time
 
+def LimparConsole():
+    os.system("cls")
+
 # Criando o socket
 Socket_Client = socket(AF_INET, SOCK_STREAM)
 
@@ -44,6 +47,7 @@ ChaveServidor = int(Socket_Client.recv(2048).decode())
 # print(f'A chave do servidor recebida foi {ChaveServidor}')
 
 
+LimparConsole()
 # Gerando as chaves compartilhadas para ambos os lados
 secretKey = (ChaveServidor ** valueA) % p
 print(f'>> A chave compartilhada: {secretKey}')
@@ -80,6 +84,8 @@ print('''De qual região você está mandando mensagem:
 regiao = input('Digite o número: ')
 
 Socket_Client.send(regiao.encode())
+
+LimparConsole()
 
 # Loop para o cliente enviar inúmeras solicitações/mensagens/arquivos
 while True:
@@ -214,4 +220,3 @@ while True:
 # 5 - sim, só dar import no html message dela e usar para printar
 # 6 - pathfile lab para deixar um path genérico independente de quem acessar!! -> falar com thiago depois,.....
 # ---> pathlib absolute() swap \\ para /
-

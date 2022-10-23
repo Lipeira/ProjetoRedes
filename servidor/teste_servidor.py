@@ -13,7 +13,29 @@ import time
 import pathlib
 import HtmlMessageIdeia
 
+def MostrarClientes():
+    vermelho = "\033[1;31m"
+    verde = "\033[1;32m"
+    vermelhobold = "\033[1;31;40m"
+    branco = "\033[1;30m"
+    azulclaro='\033[1;34m'
+    print(f"{azulclaro}-- CLIENTES CONECTADOS --")
+    counter = 1
+
+    for client in ClientesConectados:        
+        print(f"{azulclaro}- {verde}Cliente {counter}: {azulclaro}{client} -")
+        counter += 1
+
+    print("\n\n")
+
+def LimparConsole():
+    os.system("cls")
+
 def HandleRequest(Socket_Client, mClientAddr):
+    verde = "\033[1;32m"
+    brancobold = "\033[1;30;40m"
+    branco = "\033[1;30m"
+
     # Recebendo chaves comuns "p" e "g" geradas pelo cliente
     dados = Socket_Client.recv(2048).decode()
 
@@ -40,7 +62,7 @@ def HandleRequest(Socket_Client, mClientAddr):
 
     # Gerando chave compartilhada entre o servidor e o cliente
     secretKey = (chaveCliente ** valueB) % primo
-    print(f'>> A chave compartilhada: {secretKey}')
+    print(f'{branco}>> {verde}A chave compartilhada: {branco}{secretKey}')
 
     # Enviando chave para o cliente para que checar se é igual
     Socket_Client.send(str(secretKey).encode())
@@ -57,13 +79,17 @@ def HandleRequest(Socket_Client, mClientAddr):
     escrita = open ('dicionario2.txt','a')
 
     IDclient[CodCliente] = sameKey
-    print(IDclient)
 
     with escrita:
         escrita.write(f'{CodCliente} {sameKey} \n')
 
     msgident = f'>> Seu identificador é: {CodCliente}'
     Socket_Client.send(msgident.encode())
+
+    ClientesConectados.append(CodCliente)
+    LimparConsole()
+    MostrarClientes()
+    print(f"Novo Cliente Conectado: {CodCliente}")
 
     # Região do cliente para verificar se tem permissão ou não
     region = Socket_Client.recv(2048).decode()
@@ -76,6 +102,8 @@ def HandleRequest(Socket_Client, mClientAddr):
         # A mensagem recebida aqui está criptografada pelo cliente
         data = Socket_Client.recv(2048)
 
+        LimparConsole()
+        MostrarClientes()
         req = data.decode()
         print()
         print("--- Uma Mensagem foi Recebida ---")
@@ -229,10 +257,18 @@ def HandleRequest(Socket_Client, mClientAddr):
                     Socket_Client.send(rep403.encode())
                     print('A verificacao falhou. A mensagem nao pode ser verificada.')
             
-    
+
+LimparConsole()
+
+#Cores Para Terminal Python
+
+verde = "\033[1;32m"
+branco = "\033[1;30m"
+azulclaro='\033[1;34m'
+
 # Criação do socket do servidor
 Socket_Server = socket(AF_INET, SOCK_STREAM)
-print('>> Servidor criado...')
+print(f'{branco}>> {azulclaro}Servidor criado...')
 
 # Vinculando o socket do servidor a um endereço específico
 Socket_Server.bind(('127.0.0.1', 13524))
@@ -242,6 +278,7 @@ Socket_Server.listen()
 
 IDclient = {}
 
+ClientesConectados = []
 
 leitura = open ('dicionario2.txt','r')
 
@@ -255,6 +292,4 @@ contador = 0
 while True:
     # Loop para o servidor conseguir se conectar com vários clientes e colocando-o para aceitar as solicitações de conexão
     Socket_Client, clientAddr =  Socket_Server.accept()
-    print(f'>> O servidor aceitou a conexao do cliente: {clientAddr}')
-    
     Thread(target=HandleRequest, args=(Socket_Client, clientAddr)).start()
