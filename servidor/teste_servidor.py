@@ -11,7 +11,9 @@ import os
 from cryptography.fernet import Fernet
 import time
 import pathlib
-import HtmlMessageIdeia
+from email.utils import formatdate
+from datetime import datetime
+from time import mktime
 
 def MostrarClientes():
     vermelho = "\033[1;31m"
@@ -30,6 +32,117 @@ def MostrarClientes():
 
 def LimparConsole():
     os.system("cls")
+
+
+def Success():
+    now = datetime.now()
+    mStamp = mktime(now.timetuple())
+
+    # Cabeçalho das informações
+    resposta = ''
+    resposta += 'HTTP/1.1 200 OK\r\n'
+    resposta += f'Date: {formatdate(timeval=mStamp, localtime=False, usegmt=True)}\r\n'
+    resposta += 'Server: CIn UFPE/0.0.0.1 (Ubuntu)\r\n'
+    resposta += 'Content-Type: text/html\r\n'
+
+    print()
+    # Mensagem do caso solicitado
+    html = '\n'
+    # html += '<html>'
+    # html += '<head>'
+    # html += '<title>Redes de Computadores - CIn/UFPE</title>'
+    # html += '<meta charset="UTF-8">'
+    # html += '</head>'
+    # html += '<body>'
+    # html += '<h1>Requisição bem sucedida, o objeto requisitado será enviado!</h1>'
+    html += 'Requisição bem sucedida, o objeto requisitado será enviado!'
+    # html += '</body>'
+    # html += '</html>'
+
+    resposta += html
+    return resposta
+
+def NotFound():
+    now = datetime.now()
+    mStamp = mktime(now.timetuple())
+
+    # Cabeçalho das informações
+    resposta = ''
+    resposta += 'HTTP/1.1 404 Not Found\r\n'
+    resposta += f'Date: {formatdate(timeval=mStamp, localtime=False, usegmt=True)}\r\n'
+    resposta += 'Server: CIn UFPE/0.0.0.1 (Ubuntu)\r\n'
+    resposta += 'Content-Type: text/html\r\n'
+
+    print()
+    # Mensagem do caso solicitado
+    html = '\n'
+    html += '<html>'
+    html += '<head>'
+    html += '<title>Not Found - CIn/UFPE</title>'
+    html += '<meta charset="UTF-8">'
+    html += '</head>'
+    html += '<body>'
+    html += '<h1>Essa requisição não foi encontrada no servidor!</h1>'
+    html += '</body>'
+    html += '</html>'
+
+    resposta += html
+    return resposta
+
+def BadRequest():
+    now = datetime.now()
+    mStamp = mktime(now.timetuple())
+    
+    # Cabeçalho das informações
+    resposta = ''
+    resposta += 'HTTP/1.1 400 Bad Request\r\n'
+    resposta += f'Date: {formatdate(timeval=mStamp, localtime=False, usegmt=True)}\r\n'
+    resposta += 'Server: CIn UFPE/0.0.0.1 (Ubuntu)\r\n'
+    resposta += 'Content-Type: text/html\r\n'
+
+    print()
+    # Mensagm do caso solicitado
+    html = '\n'
+    html += '<html>'
+    html += '<head>'
+    html += '<title>Bad Request - CIn/UFPE</title>'
+    html += '<meta charset="UTF-8">'
+    html += '</head>'
+    html += '<body>'
+    html += '<h1>Mensagem de requisição não entendida pelo servidor, verifique se a mensagem de requisição está com algum erro de sintaxe!</h1>'
+    html += '</body>'
+    html += '</html>'
+
+    resposta += html
+    return resposta
+
+def Forbidden():
+    now = datetime.now()
+    mStamp = mktime(now.timetuple())
+
+    # Cabeçalho das informações
+    resposta = ''
+    resposta += 'HTTP/1.1 403 Forbidden\r\n'
+    resposta += f'Date: {formatdate(timeval=mStamp, localtime=False, usegmt=True)}\r\n'
+    resposta += 'Server: CIn UFPE/0.0.0.1 (Ubuntu)\r\n'
+    # resposta += f'Content-Length: '
+    resposta += 'Content-Type: text/html\r\n'
+
+    print()
+    # Mensagem do caso solicitado
+    html = '\n'
+    html += '<html>'
+    html += '<head>'
+    html += '<title>Forbidden - CIn/UFPE</title>'
+    html += '<meta charset="UTF-8">'
+    html += '</head>'
+    html += '<body>'
+    html += '<h1>Você não possui acesso a este conteúdo, logo, o servidor não pode aceitá-lo!</h1>'
+    html += '</body>'
+    html += '</html>'
+
+    resposta += html
+    return resposta
 
 def HandleRequest(Socket_Client, mClientAddr):
     verde = "\033[1;32m"
@@ -62,7 +175,6 @@ def HandleRequest(Socket_Client, mClientAddr):
 
     # Gerando chave compartilhada entre o servidor e o cliente
     secretKey = (chaveCliente ** valueB) % primo
-    print(f'{branco}>> {verde}A chave compartilhada: {branco}{secretKey}')
 
     # Enviando chave para o cliente para que checar se é igual
     Socket_Client.send(str(secretKey).encode())
@@ -89,6 +201,7 @@ def HandleRequest(Socket_Client, mClientAddr):
     ClientesConectados.append(CodCliente)
     LimparConsole()
     MostrarClientes()
+    print(f'{branco}>> {verde}A chave compartilhada: {branco}{secretKey}')
     print(f"Novo Cliente Conectado: {CodCliente}")
 
     # Região do cliente para verificar se tem permissão ou não
@@ -162,7 +275,7 @@ def HandleRequest(Socket_Client, mClientAddr):
 
             # Fazendo verificação do acesso aos arquivos, erro 403
             if region != '1':
-                answer = HtmlMessageIdeia.Forbidden()
+                answer = Forbidden()
                 print('Erro 403')
                 rep403 = cryptocode.encrypt(answer, str(secretKey))
                 Socket_Client.send(rep403.encode())
@@ -177,7 +290,7 @@ def HandleRequest(Socket_Client, mClientAddr):
 
                     # Verificando o erro 400 de bad request
                     if "\\" in DecryptedMessage or "/" in DecryptedMessage or "*" in DecryptedMessage or "?" in DecryptedMessage or "<" in DecryptedMessage or ">" in DecryptedMessage or "|" in DecryptedMessage or "." not in DecryptedMessage or "'" in DecryptedMessage or '"' in DecryptedMessage:
-                        answer = HtmlMessageIdeia.BadRequest()
+                        answer = BadRequest()
                         print('Erro 400')
                         rep402 = cryptocode.encrypt(answer, str(secretKey))
                         Socket_Client.send(rep402.encode())
@@ -192,7 +305,7 @@ def HandleRequest(Socket_Client, mClientAddr):
                         
                         # Verificando se o arquivo solicitado se encontra na pasta para retornar 200 OK
                         if DecryptedMessage in res:
-                            answer = HtmlMessageIdeia.sucesso()
+                            answer = Success()
                             print('200 OK')
                             rep200 = cryptocode.encrypt(answer, str(secretKey))
                             Socket_Client.send(rep200.encode())
@@ -246,14 +359,14 @@ def HandleRequest(Socket_Client, mClientAddr):
 
                         # Retornando Erro 404 de not found, pois arquivo não existe na pasta
                         else:
-                            answer = HtmlMessageIdeia.NaoEncontrado()
+                            answer = NotFound()
                             print('Erro 404')
                             rep404 = cryptocode.encrypt(answer, str(secretKey))
                             Socket_Client.send(rep404.encode())
 
                 # Se a mensagem se perder no caminho ou a assinatura digital/chave pública se corromperem irá dar 403 forbidden também
                 except:
-                    answer = HtmlMessageIdeia.Forbidden()
+                    answer = Forbidden()
                     print('Erro 403')
                     rep403 = cryptocode.encrypt(answer, str(secretKey))
                     Socket_Client.send(rep403.encode())

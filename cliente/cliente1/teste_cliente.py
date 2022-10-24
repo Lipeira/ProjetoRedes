@@ -2,16 +2,90 @@
 
 import random
 from socket import socket, AF_INET, SOCK_STREAM
-import raizesPrimitivas2
 import cryptocode
 import rsa
 import os
 from cryptography.fernet import Fernet
+from math import sqrt
 import time
 
 def LimparConsole():
     os.system("cls")
+ 
 
+def isPrime( n):
+    
+    if (n <= 1):
+        return False
+    if (n <= 3):
+        return True
+    if (n % 2 == 0 or n % 3 == 0):
+        return False
+    i = 5
+    while(i * i <= n):
+        if (n % i == 0 or n % (i + 2) == 0) :
+            return False
+        i = i + 6
+    return True
+ 
+
+def power( x, y, p):
+
+    res = 1 
+    x = x % p 
+    while (y > 0):
+ 
+        if (y & 1):
+            res = (res * x) % p
+ 
+        y = y >> 1 
+        x = (x * x) % p
+    return res
+ 
+
+def findPrimefactors(s, n) :
+ 
+    while (n % 2 == 0) :
+        s.add(2)
+        n = n // 2
+ 
+    for i in range(3, int(sqrt(n)), 2):
+         
+        while (n % i == 0) :
+ 
+            s.add(i)
+            n = n // i
+         
+    if (n > 2) :
+        s.add(n)
+ 
+
+def findPrimitive( n) :
+    s = set()
+ 
+  
+    if (isPrime(n) == False):
+        return -1
+ 
+    phi = n - 1
+ 
+    findPrimefactors(s, phi)
+ 
+    for r in range(2, phi + 1):
+ 
+        flag = False
+        for it in s:
+ 
+            if (power(r, phi // it, n) == 1):
+
+                flag = True
+                break
+
+        if (flag == False):
+            return r
+ 
+    return -1
+ 
 # Criando o socket
 Socket_Client = socket(AF_INET, SOCK_STREAM)
 
@@ -22,10 +96,10 @@ Socket_Client.connect(('localhost', 13524))
 
 # Criando chaves primas e a base ou seja as chaves "p" e "g"
 p = random.randint(0, 999)
-while raizesPrimitivas2.isPrime(p) == False:
+while isPrime(p) == False:
     p = random.randint(0, 999)
 
-g = raizesPrimitivas2.findPrimitive(p)
+g = findPrimitive(p)
 
 # Enviando as chaves padrões para o servidor
 Socket_Client.send((f'{p} {g}').encode())
@@ -95,6 +169,7 @@ while True:
     [1] Paris.jpg 
     [2] postagem.png
     [3] teste.pdf
+    [4] 50mbfile.pdf
 
     OBS: a escrita incorreta ou o nome de um arquivo não listado irá ocasionar erro e será solicitado novamente o arquivo desejado''')
     print()
@@ -193,32 +268,3 @@ while True:
 
         else:
             print(code)
-
-
-
-# COMENTÁRIOS PARA MELHORAR CÓDIGO
-
-
-# fazer condicional para verificar se o cliente quer ocntinuar a conexao ou nao
-# botar criptografia no arquivo e ver se fernet aguenta 4 clientes seguidos... ver solução q mandei pra thiago
-# tem problema do fernet --> 1 cliente solicitar algo e o 1 morrer...............
-# ver se o 2048 recebendo do cliente aguetna 
-
-# 1 - feito
-# 2 e 3- salvar cada arquivo com o cod do cliente para criar varios arqs...
-# 4 - aguenta!!!
-
-# OBS: assinatura as vezes funciona e as vezes nao (na maioria funciona... talvez o numero das chaves nao seja fixo???)
-# o get é só a pergunta??
-# o servidor web é só enviar arquivo??
-# questões sobre o forbidden...
-# mensagem em cada caso só copiar aquela msg?
-# COMO botar caminho diretório generico 
-
-# 1 - olhar com calma depois...
-# 2 - sim. o input é o get ---> criar um if para fazer ter 3 opções de escolha
-# 3 -  sim ---> testar com arquivos grandes dps (50Mb)
-# 4 - fazer algum jeito de analisar o identificador do cliente... para corromper e garantir que nao tenha permissao (verification failed do verify do RSA)
-# 5 - sim, só dar import no html message dela e usar para printar
-# 6 - pathfile lab para deixar um path genérico independente de quem acessar!! -> falar com thiago depois,.....
-# ---> pathlib absolute() swap \\ para /
