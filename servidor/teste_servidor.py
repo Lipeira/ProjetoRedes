@@ -15,6 +15,8 @@ from email.utils import formatdate
 from datetime import datetime
 from time import mktime
 
+
+# Função para mostrar os clientes conectados até o momento
 def MostrarClientes():
     vermelho = "\033[1;31m"
     verde = "\033[1;32m"
@@ -30,10 +32,13 @@ def MostrarClientes():
 
     print("\n\n")
 
+
+# Função para limpar o console do terminal possibilitando uma melhor visualização
 def LimparConsole():
     os.system("cls")
 
 
+# Função para retornar mensagem de sucesso ao requisitar arquivo
 def Success():
     now = datetime.now()
     mStamp = mktime(now.timetuple())
@@ -62,6 +67,7 @@ def Success():
     resposta += html
     return resposta
 
+# Função para retornar mensagem de arquivo não encontrado ao requisitar arquivo
 def NotFound():
     now = datetime.now()
     mStamp = mktime(now.timetuple())
@@ -89,6 +95,7 @@ def NotFound():
     resposta += html
     return resposta
 
+# Função para retornar mensagem de erro de sintaxe ao requisitar arquivo
 def BadRequest():
     now = datetime.now()
     mStamp = mktime(now.timetuple())
@@ -116,6 +123,7 @@ def BadRequest():
     resposta += html
     return resposta
 
+# Função para retornar mensagem de acesso negado ao requisitar arquivo
 def Forbidden():
     now = datetime.now()
     mStamp = mktime(now.timetuple())
@@ -144,6 +152,7 @@ def Forbidden():
     resposta += html
     return resposta
 
+# Função para possibilitar a existência de threads (mais de um cliente) e possibilitar mais de uma requisição/resposta
 def HandleRequest(Socket_Client, mClientAddr):
     verde = "\033[1;32m"
     brancobold = "\033[1;30;40m"
@@ -201,7 +210,7 @@ def HandleRequest(Socket_Client, mClientAddr):
     ClientesConectados.append(CodCliente)
     LimparConsole()
     MostrarClientes()
-    print(f'{branco}>> {verde}A chave compartilhada: {branco}{secretKey}')
+    print(f'{branco}>> {verde}A chave secreta comum (compartilhada) é: {branco}{secretKey}')
     print(f"Novo Cliente Conectado: {CodCliente}")
 
     # Região do cliente para verificar se tem permissão ou não

@@ -13,6 +13,7 @@ def LimparConsole():
     os.system("cls")
  
 
+# Função para verificar se o número é primo
 def isPrime( n):
     
     if (n <= 1):
@@ -28,7 +29,7 @@ def isPrime( n):
         i = i + 6
     return True
  
-
+# Função auxiliar 
 def power( x, y, p):
 
     res = 1 
@@ -42,7 +43,7 @@ def power( x, y, p):
         x = (x * x) % p
     return res
  
-
+# Função para achar fatores primos
 def findPrimefactors(s, n) :
  
     while (n % 2 == 0) :
@@ -59,7 +60,7 @@ def findPrimefactors(s, n) :
     if (n > 2) :
         s.add(n)
  
-
+# Função para achar raiz primitiva usada na chave pública
 def findPrimitive( n) :
     s = set()
  
@@ -124,7 +125,7 @@ ChaveServidor = int(Socket_Client.recv(2048).decode())
 LimparConsole()
 # Gerando as chaves compartilhadas para ambos os lados
 secretKey = (ChaveServidor ** valueA) % p
-print(f'>> A chave compartilhada: {secretKey}')
+print(f'>> A chave secreta comum (compartilhada) é:: {secretKey}')
 
 # Mandando a chave compartilhada para o servidor para que tenha noção que é igual
 Socket_Client.send(str(secretKey).encode())
@@ -239,7 +240,7 @@ while True:
                         break
                     file.write(data)
 
-            print(f'{message1} recebido!\n')
+            print(f'{message1} solicitado recebido com sucesso!\n')
 
             # Abrindo a chave para descriptografar arquivos
             with open(str(identify) + '.key', 'rb') as file_chave:
