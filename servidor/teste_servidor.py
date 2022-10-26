@@ -407,8 +407,8 @@ leitura = open ('dicionario2.txt','r')
 
 with leitura:
     for linha in leitura:
-        chave, conteudo = linha.split()
-        IDclient[chave] = conteudo
+        conteudo, chave = linha.split()
+        IDclient[conteudo] = chave
 
 contador = 0
 

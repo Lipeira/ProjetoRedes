@@ -105,6 +105,7 @@ Socket_Client = socket(AF_INET, SOCK_STREAM)
 # Colocando o socket para realizar solicitações
 Socket_Client.connect(('localhost', 13524))
 
+# Gerando chaves públicas e privadas da biblioteca RSA para ser usada na assinatura digital e na verificação pelo servidor
 (pubKey, privKey) = rsa.newkeys(512)
 
 # Criando chaves primas e a base ou seja as chaves "p" e "g"
