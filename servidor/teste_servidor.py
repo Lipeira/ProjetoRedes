@@ -217,9 +217,11 @@ def HandleRequest(Socket_Client, mClientAddr):
     region1 = Socket_Client.recv(2048).decode()
     region = cryptocode.decrypt(region1, str(secretKey))
 
+    # Geração da chave a ser usada pela biblioteca Fernet para criptografar arquivos
+    key = Fernet.generate_key()
+
     while IDclient[CodCliente] == sameKey:
-        # Loop para O servidor receber diversas requisições de um mesmo cliente sem criar uma nova conexão
-        # print('Esperando o próximo pacote ...')
+        # Loop para o servidor receber diversas requisições de um mesmo cliente sem criar uma nova conexão
 
         # Recebendo os dados do cliente e decodificando para mostrar o que foi recebido por ele
         # A mensagem recebida aqui está criptografada pelo cliente
@@ -240,7 +242,6 @@ def HandleRequest(Socket_Client, mClientAddr):
         sameKey = ListDecrypted[1]
 
         #Condição close connection
-
         if DecryptedMessage == "close":
             print(f"A conexão com o cliente {CodCliente} foi finalizada.")
             ClientesConectados.remove(CodCliente)
@@ -278,6 +279,7 @@ def HandleRequest(Socket_Client, mClientAddr):
             
 
             ############################################################
+            
             # Projeto 2
 
             # Continuar aqui
@@ -318,10 +320,7 @@ def HandleRequest(Socket_Client, mClientAddr):
                             print('200 OK')
                             rep200 = cryptocode.encrypt(answer, str(secretKey))
                             Socket_Client.send(rep200.encode())
-
-                            # Geração da chave a ser usada pela biblioteca Fernet para criptografar arquivos
-                            key = Fernet.generate_key()
-
+                            
                             # Salvando a chave em um arquivo para que o servidor sempre tenha conhecimento de como criptografar arquivos
                             with open(str(CodCliente) + '.key', 'wb') as arq:
                                 arq.write(key)
