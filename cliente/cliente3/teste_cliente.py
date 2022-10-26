@@ -87,6 +87,18 @@ def findPrimitive( n) :
  
     return -1
  
+
+#Definindo cores
+verdeaguab = '\033[1;36;40m'
+roxo= '\033[1;35m'
+vermelho= '\033[1;31m'
+amarelo= '\033[1;33m'
+verdeagua='\033[1;36m'
+azulclarob='\033[1;34;40m'
+verdeaguab='\033[1;36;40m'
+verde='\033[1;32m'
+brancob= '\033[1;30;40m'
+
 # Criando o socket
 Socket_Client = socket(AF_INET, SOCK_STREAM)
 
@@ -125,7 +137,7 @@ ChaveServidor = int(Socket_Client.recv(2048).decode())
 LimparConsole()
 # Gerando as chaves compartilhadas para ambos os lados
 secretKey = (ChaveServidor ** valueA) % p
-print(f'>> A chave secreta comum (compartilhada) é:: {secretKey}')
+print(f'{brancob}>> A chave secreta comum (compartilhada) é:: {secretKey}')
 
 # Mandando a chave compartilhada para o servidor para que tenha noção que é igual
 Socket_Client.send(str(secretKey).encode())
@@ -145,18 +157,18 @@ identify = identificador[-1]
 
 
 # Recebendo informações sobre a região do cliente
-print('''De qual região você está mandando mensagem: 
-    [1] América do Sul
-    [2] América do Norte
-    [3] Europa 
-    [4] Ásia
-    [5] Oceania 
-    [6] África 
-    [7] Antártida 
+print(f'''{azulclarob}De qual região você está mandando mensagem: 
+    {roxo}[1] {verdeaguab}América do Sul
+    {roxo}[2] {verdeaguab}América do Norte
+    {roxo}[3] {verdeaguab}Europa 
+    {roxo}[4] {verdeaguab}Ásia
+    {roxo}[5] {verdeaguab}Oceania 
+    {roxo}[6] {verdeaguab}África 
+    {roxo}[7] {verdeaguab}Antártida 
     
-    OBS: todas as regiões com exceção da AMÉRICA DO SUL (número 1) estão com acesso restrito''')
+    {verde}OBS: todas as regiões com exceção da AMÉRICA DO SUL (número 1) estão com acesso restrito''')
 
-regiao = input('Digite o número: ')
+regiao = input(f'{azulclarob}Digite o número: ')
 
 Socket_Client.send((cryptocode.encrypt(regiao, str(secretKey))).encode())
 
@@ -166,15 +178,15 @@ LimparConsole()
 while True:
     print()
     # Mensagem que o cliente deseja enviar
-    print('''Escolha um dos arquivos para receber: 
-    [1] Paris.jpg 
-    [2] postagem.png
-    [3] teste.pdf
-    [4] 50mbfile.pdf
+    print(f'''{verdeaguab}Escolha um dos arquivos para receber: 
+    {roxo}[1] {verde}Paris.jpg 
+    {roxo}[2] {verde}postagem.png
+    {roxo}[3] {verde}teste.pdf
+    {roxo}[4] {verde}50mbfile.pdf
 
-    OBS: a escrita incorreta ou o nome de um arquivo não listado irá ocasionar erro e será solicitado novamente o arquivo desejado''')
+    {vermelho}OBS: a escrita incorreta ou o nome de um arquivo não listado irá ocasionar erro e será solicitado novamente o arquivo desejado''')
     print()
-    message1 = input('Escreva o nome do arquivo desejado (Digite "close" para encerrar a conexão): ')
+    message1 = input(f'{verdeaguab}Escreva o nome do arquivo desejado (Digite "close" para encerrar a conexão): ')
     print()
     # Verificação para fechar a conexão do cliente com o servidor
     if message1 == "close":
@@ -223,7 +235,7 @@ while True:
         # Se o código for 200 irá receber o arquivo criptografado e descriptografar para a visualização
         if codeSplit[1] == '200':
 
-            print(code)
+            print(f"{verde}{code}")
 
             # Recebendo chave do cliente para descriptografar o arquivo que recebeu criptografado
             with open(str(identify) + '.key', 'wb') as file_chave:
@@ -240,7 +252,7 @@ while True:
                         break
                     file.write(data)
 
-            print(f'{message1} solicitado recebido com sucesso!\n')
+            print(f'{verde}{message1} solicitado recebido com sucesso!\n')
 
             # Abrindo a chave para descriptografar arquivos
             with open(str(identify) + '.key', 'rb') as file_chave:
@@ -262,10 +274,10 @@ while True:
         
         # Caso não retorne o código 200 irá gerar os erros específicos
         elif codeSplit[1] == '403':
-            print(code)
+            print(f"{amarelo}{code}")
 
         elif codeSplit[1] == '404':
-           print(code)
+           print(f"{vermelho}{code}")
 
         else:
-            print(code)
+            print(f"{azulclarob}{code}")
