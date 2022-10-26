@@ -220,6 +220,13 @@ def HandleRequest(Socket_Client, mClientAddr):
     # Geração da chave a ser usada pela biblioteca Fernet para criptografar arquivos
     key = Fernet.generate_key()
 
+    # Salvando a chave em um arquivo para que o servidor sempre tenha conhecimento de como criptografar arquivos
+    with open(str(CodCliente) + '.key', 'wb') as arq:
+        arq.write(key)
+
+    # Usando a chave gerada pela biblioteca Fernet
+    fernetKey = Fernet(key)
+
     while IDclient[CodCliente] == sameKey:
         # Loop para o servidor receber diversas requisições de um mesmo cliente sem criar uma nova conexão
 
@@ -320,19 +327,12 @@ def HandleRequest(Socket_Client, mClientAddr):
                             print('200 OK')
                             rep200 = cryptocode.encrypt(answer, str(secretKey))
                             Socket_Client.send(rep200.encode())
-                            
-                            # Salvando a chave em um arquivo para que o servidor sempre tenha conhecimento de como criptografar arquivos
-                            with open(str(CodCliente) + '.key', 'wb') as arq:
-                                arq.write(key)
 
-                            # Abrindo a chave para enviar para o cliente também
+                            # Enviando a chave para que o cliente também possa usá-la
                             with open(str(CodCliente) + '.key', 'rb') as arq:
                                 chaveArquivo = arq.read().decode()
-                                msg = cryptocode.encrypt(chaveArquivo, str(secretKey))
-                                Socket_Client.send(msg.encode())
-
-                            # Usando a chave gerada pela biblioteca Fernet
-                            fernetKey = Fernet(key)
+                                mensagem_Chave_Cliente = cryptocode.encrypt(chaveArquivo, str(secretKey))
+                                Socket_Client.send(mensagem_Chave_Cliente.encode())
 
                             # Abrindo o arquivo original para criptografar
                             with open(dir_path + DecryptedMessage, 'rb') as arquivo:
@@ -356,10 +356,10 @@ def HandleRequest(Socket_Client, mClientAddr):
 
                             # Abrindo o arquivo criptografado que foi substituido dentro do servidor
                             with open(dir_path + DecryptedMessage, 'rb') as fileCry:
-                                encriptado = fileCry.read()
+                                Encrypted = fileCry.read()
 
                             # Descriptografando o arquivo
-                            fileDecrypto = fernetKey.decrypt(encriptado)
+                            fileDecrypto = fernetKey.decrypt(Encrypted)
 
                             # Abrindo o arquivo no modo de gravação e gravando os dados descriptografados dentro do servidor (substituindo)
                             with open(dir_path + DecryptedMessage, 'wb') as fileDecry:

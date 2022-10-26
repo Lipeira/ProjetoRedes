@@ -241,9 +241,16 @@ while True:
             # Recebendo chave do cliente para descriptografar o arquivo que recebeu criptografado
             with open(str(identify) + '.key', 'wb') as file_chave:
                 chaveArq = Socket_Client.recv(2048).decode()
-                msg = cryptocode.decrypt(chaveArq, str(secretKey)).encode()
-                file_chave.write(msg)
+                mensagem_Chave_Cliente = cryptocode.decrypt(chaveArq, str(secretKey)).encode()
+                file_chave.write(mensagem_Chave_Cliente)
             
+            # Abrindo a chave para descriptografar arquivos
+            with open(str(identify) + '.key', 'rb') as file_chave:
+                chaveArq = file_chave.read()
+
+            # Usando a chave da biblioteca Fernet para começar descriptografar
+            fernetKey = Fernet(chaveArq)
+
             # Recebendo arquivo criptografado
             with open(message1, 'wb') as file:
                 while 1:
@@ -254,13 +261,6 @@ while True:
                     file.write(data)
 
             print(f'{verde}{message1} solicitado recebido com sucesso!\n')
-
-            # Abrindo a chave para descriptografar arquivos
-            with open(str(identify) + '.key', 'rb') as file_chave:
-                chaveArq = file_chave.read()
-
-            # Usando a chave da biblioteca Fernet para começar descriptografar
-            fernetKey = Fernet(chaveArq)
 
             # Abrindo o arquivo criptografado
             with open(message1, 'rb') as fileEncrypt:
