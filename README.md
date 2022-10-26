@@ -9,7 +9,7 @@
 
 ## Status:
 * Projeto 1: Finalizado. 
-* Projeto 2: Finalizado
+* Projeto 2: Finalizado.
 
 -----
 
