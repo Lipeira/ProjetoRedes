@@ -8,8 +8,8 @@
 - Clique [AQUI](https://www.canva.com/design/DAFQA3Fc8H4/bbuTKf6FC4aISg6oGxbT0A/edit?utm_content=DAFQA3Fc8H4&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton) para acessar a apresentação em slides
 
 ## Status:
-* Projeto 1: Em Desenvolvimento 
-* Projeto 2: Em Desenvolvimento
+* Projeto 1: Finalizado. 
+* Projeto 2: Finalizado
 
 -----
 
