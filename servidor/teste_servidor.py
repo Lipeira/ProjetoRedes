@@ -328,9 +328,19 @@ def HandleRequest(Socket_Client, mClientAddr):
                             rep200 = cryptocode.encrypt(answer, str(secretKey))
                             Socket_Client.send(rep200.encode())
 
-                            # Enviando a chave para que o cliente também possa usá-la
+                            # Abrindo o arquivo e pegando a chave que foi armazenado nele
                             with open(str(CodCliente) + '.key', 'rb') as arq:
                                 chaveArquivo = arq.read().decode()
+                            
+                            # Verificando se a chave do arquivo é realmente igual a chave que foi gerada anteriormente
+                            # Se for igual enviar ela para o cliente
+                            if chaveArquivo == key.decode():
+                                mensagem_Chave_Cliente = cryptocode.encrypt(chaveArquivo, str(secretKey))
+                                Socket_Client.send(mensagem_Chave_Cliente.encode())
+                                
+                            # Se por algum motivo a chave não for igual mandar a que foi gerada primeiramente (original)
+                            else:
+                                chaveArquivo = key.decode()
                                 mensagem_Chave_Cliente = cryptocode.encrypt(chaveArquivo, str(secretKey))
                                 Socket_Client.send(mensagem_Chave_Cliente.encode())
 
