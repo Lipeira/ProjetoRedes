@@ -192,21 +192,26 @@ def HandleRequest(Socket_Client, mClientAddr):
     respostaCliente = Socket_Client.recv(2048)
     sameKey = respostaCliente.decode()
 
+    # Gerando identificador do cliente
     CodCliente = str(uuid.uuid4())
     while CodCliente in IDclient:
         CodCliente = str(uuid.uuid4())
 
-
+    # Inicializando o arquivo para escrever
     escrita = open ('dicionario2.txt','a')
 
+    # Alocando novo usuário no dicionário e sua chave secreta comum
     IDclient[CodCliente] = sameKey
 
+    # Escrevendo no arquivo texto a chave secreta comum do usuário e seu identificador
     with escrita:
         escrita.write(f'{CodCliente} {sameKey} \n')
 
+    # Mandando o identificador para o cliente
     msgident = f'>> Seu identificador é: {CodCliente}'
     Socket_Client.send((cryptocode.encrypt(msgident, str(secretKey))).encode())
 
+    # Mostrando os usuários conectados e a chave secreta gerada pelo usuário naquele momento
     ClientesConectados.append(CodCliente)
     LimparConsole()
     MostrarClientes()
@@ -227,9 +232,8 @@ def HandleRequest(Socket_Client, mClientAddr):
     # Usando a chave gerada pela biblioteca Fernet
     fernetKey = Fernet(key)
 
+    # Loop para o servidor receber diversas requisições de um mesmo cliente sem criar uma nova conexão
     while IDclient[CodCliente] == sameKey:
-        # Loop para o servidor receber diversas requisições de um mesmo cliente sem criar uma nova conexão
-
         # Recebendo os dados do cliente e decodificando para mostrar o que foi recebido por ele
         # A mensagem recebida aqui está criptografada pelo cliente
         data = Socket_Client.recv(2048)
@@ -329,6 +333,7 @@ def HandleRequest(Socket_Client, mClientAddr):
                             Socket_Client.send(rep200.encode())
 
                             # Abrindo o arquivo e pegando a chave que foi armazenado nele
+                            # Agradecimento a (https://acervolima.com/criptografar-e-descriptografar-arquivos-usando-python/)
                             with open(str(CodCliente) + '.key', 'rb') as arq:
                                 chaveArquivo = arq.read().decode()
                             
@@ -359,9 +364,10 @@ def HandleRequest(Socket_Client, mClientAddr):
                             with open(dir_path + DecryptedMessage, 'rb') as file:
                                 for data in file.readlines():
                                     Socket_Client.send(data)
-
+                                
+                                # Usando biblioteca time e botando sleep, pois o servidor não estava enviando arquivos vazios, então obrigamos a enviar uma nova mensagem e demos um tempo para o servidor respirar e não enviar concatenado com os bytes do arquivo
                                 time.sleep(1)
-                                rep = 'Arquivo solicitado entregue com sucesso!'
+                                rep = '-----FIM DO ARQUIVO-----'
                                 Socket_Client.send(rep.encode())
 
                             # Abrindo o arquivo criptografado que foi substituido dentro do servidor
@@ -409,12 +415,16 @@ Socket_Server.bind(('127.0.0.1', 13524))
 # Colocando o servidor para escutar as solicitações de conexão dos inúmeros clientes
 Socket_Server.listen()
 
+# Criando dicionário para armazenar as chaves secretas dos clientes e seus identificadores
 IDclient = {}
 
+# Criando lista para mostrar quais os clientes conectados no momento
 ClientesConectados = []
 
+# Abrindo o arquivo em que são salvos os dados dos clientes
 leitura = open ('dicionario2.txt','r')
 
+# Inicializando o dicionário do servidor para que ele tenha conhecimento de todos os clientes já conectados e faça o gerenciamento das informações
 with leitura:
     for linha in leitura:
         conteudo, chave = linha.split()
@@ -422,8 +432,8 @@ with leitura:
 
 contador = 0
 
+# Loop para o servidor conseguir se conectar com vários clientes e inicializando várias Threads permitindo mais de um cliente
 while True:
-    # Loop para o servidor conseguir se conectar com vários clientes e colocando-o para aceitar as solicitações de conexão
     Socket_Client, clientAddr =  Socket_Server.accept()
     Thread(target=HandleRequest, args=(Socket_Client, clientAddr)).start()
 

@@ -61,6 +61,7 @@ def findPrimefactors(s, n) :
         s.add(n)
  
 # Função para achar raiz primitiva usada na chave pública
+# Agradecimento a (https://acervolima.com/raiz-primitiva-de-um-numero-primo-n-modulo-n/)
 def findPrimitive( n) :
     s = set()
  
@@ -179,7 +180,7 @@ LimparConsole()
 while True:
     print()
     # Mensagem que o cliente deseja enviar
-    print(f'''{verdeaguab}Escolha um dos arquivos para receber: 
+    print(f'''{verdeaguab}Digite o nome do arquivo para receber (o nome com o ponto e tipo e não o número): 
     {roxo}[1] {verde}Paris.jpg 
     {roxo}[2] {verde}postagem.png
     {roxo}[3] {verde}teste.pdf
@@ -239,47 +240,63 @@ while True:
             print(f"{verde}{code}")
 
             # Recebendo chave do cliente para descriptografar o arquivo que recebeu criptografado
+            # Agradecimento a (https://acervolima.com/criptografar-e-descriptografar-arquivos-usando-python/)
+            chaveArq = Socket_Client.recv(2048).decode()
+            mensagem_Chave_Cliente = cryptocode.decrypt(chaveArq, str(secretKey)).encode()
+
+            # Escrevendo a chave em um arquivo para manter salvo
             with open(str(identify) + '.key', 'wb') as file_chave:
-                chaveArq = Socket_Client.recv(2048).decode()
-                mensagem_Chave_Cliente = cryptocode.decrypt(chaveArq, str(secretKey)).encode()
                 file_chave.write(mensagem_Chave_Cliente)
             
-            # Abrindo a chave para descriptografar arquivos
+            # Lendo o lugar onde foi salvo a chave
             with open(str(identify) + '.key', 'rb') as file_chave:
                 chaveArq = file_chave.read()
 
-            # Usando a chave da biblioteca Fernet para começar descriptografar
-            fernetKey = Fernet(chaveArq)
-
+            # Verificando se a chave não foi corrompida e é realmente igual
+            # Criando a chave da biblioteca Fernet para descriptografar
+            # Se for igual mantém a chave lida no arquivo mesmo
+            if chaveArq == mensagem_Chave_Cliente.decode():
+                fernetKey = Fernet(chaveArq)
+            
+            # Se por algum motivo der diferente então usar a chave original que foi recebida
+            else:
+                fernetKey = Fernet(mensagem_Chave_Cliente.decode())
+        
             # Recebendo arquivo criptografado
             with open(message1, 'wb') as file:
                 while 1:
-                    # recebendo arquivo do servidor
+                    # Recebendo byte por byte do servidor
                     data = Socket_Client.recv(1000000)
-                    if data == b'Arquivo solicitado entregue com sucesso!':
+                    # Verificando se o servidor mandou a condição de parada do arquivo para não esperar infinitamente e dando break
+                    if data == b'-----FIM DO ARQUIVO-----':
                         break
+                    # Escrevend o arquivo novamente a partir dos bytes recebidos
                     file.write(data)
-
-            print(f'{verde}{message1} solicitado recebido com sucesso!\n')
 
             # Abrindo o arquivo criptografado
             with open(message1, 'rb') as fileEncrypt:
-                encriptado = fileEncrypt.read()
+                Encrypted = fileEncrypt.read()
 
             # Descriptografando o arquivo
-            descriptado = fernetKey.decrypt(encriptado)
+            Descrypteddd = fernetKey.decrypt(Encrypted)
 
             # Abrindo o arquivo no modo de gravação e gravando os dados descriptografados no próprio arquivo (substituindo)
             with open(message1, 'wb') as fileDecrypt:
-                fileDecrypt.write(descriptado)
+                fileDecrypt.write(Descrypteddd)
+            
+            # Printando apenas para notificar o recebimento
+            print(f'O arquivo {verde}{message1} solicitado foi recebido com sucesso! Solicite algo novamente ou digite close.\n')
         
         # Caso não retorne o código 200 irá gerar os erros específicos
+        # Se o código for 403 retorna erro 403
         elif codeSplit[1] == '403':
             print(f"{amarelo}{code}")
 
+        # Se o código for 404 retorna erro 404
         elif codeSplit[1] == '404':
            print(f"{vermelho}{code}")
 
+        # Se o código for 400 retorna o erro 400 (else, pois só sobrou ele mesmo)
         else:
             print(f"{azulclarob}{code}")
 
