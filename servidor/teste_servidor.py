@@ -426,3 +426,12 @@ while True:
     # Loop para o servidor conseguir se conectar com vários clientes e colocando-o para aceitar as solicitações de conexão
     Socket_Client, clientAddr =  Socket_Server.accept()
     Thread(target=HandleRequest, args=(Socket_Client, clientAddr)).start()
+
+
+
+# COMENTÁRIOS PARA MELHORIA
+# 1) ajeitar print html
+# 2) como fazer gerenciamento de identificadores que sempre mudam?
+# 3) organizar código
+# 4) tentar otimizar??
+

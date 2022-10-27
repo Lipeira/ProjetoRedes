@@ -282,3 +282,10 @@ while True:
 
         else:
             print(f"{azulclarob}{code}")
+
+# COMENTÁRIOS PARA MELHORIA
+# 1) ajeitar print html
+# 2) como fazer gerenciamento de identificadores que sempre mudam?
+# 3) organizar código
+# 4) tentar otimizar??
+
